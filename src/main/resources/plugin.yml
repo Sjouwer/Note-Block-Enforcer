@@ -1,5 +1,5 @@
 name: NoteBlockEnforcer
-version: 1.0.0
+version: 1.0.2
 main: "io.github.sjouwer.noteblockenforcer.NoteBlockEnforcer"
 
 author: Sjouwer

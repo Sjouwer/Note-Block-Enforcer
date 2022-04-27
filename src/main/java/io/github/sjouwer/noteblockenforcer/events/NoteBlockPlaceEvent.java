@@ -1,4 +1,4 @@
-package io.github.sjouwer.noteblockenforcer;
+package io.github.sjouwer.noteblockenforcer.events;
 
 import net.minecraft.server.v1_14_R1.NBTTagCompound;
 import org.bukkit.Instrument;
@@ -12,18 +12,16 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.inventory.ItemStack;
 
-public class NoteBlockPlaceEvent implements Listener
-{
+public class NoteBlockPlaceEvent implements Listener {
     @EventHandler
-    public void forceNoteBlockNBTState(BlockPlaceEvent event)
-    {
+    public void forceNoteBlockNBTState(BlockPlaceEvent event) {
         Block block = event.getBlockPlaced();
-        if(!(block.getType().equals(Material.NOTE_BLOCK))) {
+        if(block.getType() != Material.NOTE_BLOCK) {
             return;
         }
 
         ItemStack item = event.getItemInHand();
-        if (!item.getType().equals(Material.NOTE_BLOCK)) {
+        if (item.getType() != Material.NOTE_BLOCK) {
             return;
         }
 
