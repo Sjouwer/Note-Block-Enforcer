@@ -1,0 +1,11 @@
+name: NoteBlockEnforcer
+version: 1.0.0
+main: "io.github.sjouwer.noteblockenforcer.NoteBlockEnforcer"
+
+author: Sjouwer
+
+api-version: 1.14
+
+depends: []
+soft-depend: []
+loadbefore: []
