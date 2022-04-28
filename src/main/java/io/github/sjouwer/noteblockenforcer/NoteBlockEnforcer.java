@@ -1,5 +1,6 @@
 package io.github.sjouwer.noteblockenforcer;
 
+import io.github.sjouwer.noteblockenforcer.events.NoteBlockInteractEvent;
 import io.github.sjouwer.noteblockenforcer.events.NoteBlockPhysicsEvent;
 import io.github.sjouwer.noteblockenforcer.events.NoteBlockPlaceEvent;
 import org.bukkit.Bukkit;
@@ -10,6 +11,7 @@ public class NoteBlockEnforcer extends JavaPlugin {
     public void onEnable() {
         Bukkit.getPluginManager().registerEvents(new NoteBlockPlaceEvent(), this);
         Bukkit.getPluginManager().registerEvents(new NoteBlockPhysicsEvent(), this);
+        Bukkit.getPluginManager().registerEvents(new NoteBlockInteractEvent(), this);
     }
 
     @Override

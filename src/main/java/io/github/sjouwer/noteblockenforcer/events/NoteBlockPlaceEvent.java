@@ -16,7 +16,7 @@ public class NoteBlockPlaceEvent implements Listener {
     @EventHandler
     public void forceNoteBlockNBTState(BlockPlaceEvent event) {
         Block block = event.getBlockPlaced();
-        if(block.getType() != Material.NOTE_BLOCK) {
+        if (block.getType() != Material.NOTE_BLOCK) {
             return;
         }
 
@@ -40,7 +40,7 @@ public class NoteBlockPlaceEvent implements Listener {
         }
     }
 
-    public Instrument getInstrument(String nbtInstrument) {
+    private Instrument getInstrument(String nbtInstrument) {
         switch (nbtInstrument) {
             case "BASEDRUM": return Instrument.BASS_DRUM;
             case "SNARE": return Instrument.SNARE_DRUM;
