@@ -4,6 +4,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
@@ -14,14 +15,20 @@ import org.bukkit.inventory.ItemStack;
 public class NoteBlockInteractEvent implements Listener {
     @EventHandler
     public void placeNoteBlockInstead(PlayerInteractEvent event) {
-        if (event.getAction() == Action.RIGHT_CLICK_BLOCK && event.getClickedBlock() != null && event.getClickedBlock().getType() == Material.NOTE_BLOCK) {
+        Block clickedBlock = event.getClickedBlock();
+        if (event.getAction() == Action.RIGHT_CLICK_BLOCK && clickedBlock != null && clickedBlock.getType() == Material.NOTE_BLOCK) {
+            Player player = event.getPlayer();
+            if (player.isSneaking() && player.getInventory().getItemInMainHand().getType() != Material.AIR) {
+                return;
+            }
+
             ItemStack item = event.getItem();
-            Block relativeBlock = event.getClickedBlock().getRelative(event.getBlockFace());
+            Block relativeBlock = clickedBlock.getRelative(event.getBlockFace());
             if (isPlaceable(relativeBlock) && item != null && item.getType().isBlock() && event.getHand() != null) {
                 BlockState replacedBlockState = relativeBlock.getState();
                 relativeBlock.setType(item.getType());
 
-                BlockPlaceEvent blockPlaceEvent = new BlockPlaceEvent(relativeBlock, replacedBlockState, event.getClickedBlock(), item, event.getPlayer(), true, event.getHand());
+                BlockPlaceEvent blockPlaceEvent = new BlockPlaceEvent(relativeBlock, replacedBlockState, clickedBlock, item, player, true, event.getHand());
                 Bukkit.getPluginManager().callEvent(blockPlaceEvent);
                 if (blockPlaceEvent.isCancelled()) {
                     relativeBlock.setBlockData(replacedBlockState.getBlockData());
