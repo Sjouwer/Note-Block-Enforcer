@@ -1,61 +1,75 @@
 package io.github.sjouwer.noteblockenforcer.events;
 
-import org.bukkit.Bukkit;
+import net.minecraft.server.v1_14_R1.*;
+import org.bukkit.GameMode;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
-import org.bukkit.block.BlockState;
+import org.bukkit.craftbukkit.v1_14_R1.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_14_R1.inventory.CraftItemStack;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
-import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 
 public class NoteBlockInteractEvent implements Listener {
     @EventHandler
-    public void placeNoteBlockInstead(PlayerInteractEvent event) {
+    public void placeBlockInstead(PlayerInteractEvent event) {
         Block clickedBlock = event.getClickedBlock();
-        if (event.getAction() == Action.RIGHT_CLICK_BLOCK && clickedBlock != null && clickedBlock.getType() == Material.NOTE_BLOCK) {
-            Player player = event.getPlayer();
-            if (player.isSneaking() && player.getInventory().getItemInMainHand().getType() != Material.AIR) {
-                return;
-            }
+        if (event.getAction() != Action.RIGHT_CLICK_BLOCK || clickedBlock == null || clickedBlock.getType() != Material.NOTE_BLOCK) {
+            return;
+        }
 
-            ItemStack item = event.getItem();
-            Block relativeBlock = clickedBlock.getRelative(event.getBlockFace());
-            if (isPlaceable(relativeBlock) && item != null && item.getType().isBlock() && event.getHand() != null) {
-                BlockState replacedBlockState = relativeBlock.getState();
-                relativeBlock.setType(item.getType());
+        Player player = event.getPlayer();
+        if (player.isSneaking() && player.getInventory().getItemInMainHand().getType() != Material.AIR) {
+            return;
+        }
 
-                BlockPlaceEvent blockPlaceEvent = new BlockPlaceEvent(relativeBlock, replacedBlockState, clickedBlock, item, player, true, event.getHand());
-                Bukkit.getPluginManager().callEvent(blockPlaceEvent);
-                if (blockPlaceEvent.isCancelled()) {
-                    relativeBlock.setBlockData(replacedBlockState.getBlockData());
-                }
-            }
-            event.setCancelled(true);
+        event.setCancelled(true);
+
+        ItemStack item = event.getItem();
+        if (item == null) {
+            return;
+        }
+
+        EquipmentSlot hand = event.getHand();
+        if (hand == null) {
+            return;
+        }
+
+        int itemAmount = item.getAmount();
+        if (player.getGameMode() == GameMode.CREATIVE && itemAmount == 1) {
+            item.setAmount(2);
+        }
+
+        Block relativeBlock = clickedBlock.getRelative(event.getBlockFace());
+        placeItem(player, item, relativeBlock, hand);
+
+        if (player.getGameMode() == GameMode.CREATIVE) {
+            item.setAmount(itemAmount);
         }
     }
 
-    private boolean isPlaceable(Block block) {
-        if (block.isEmpty() || block.isLiquid()) {
-            return true;
-        }
+    private void placeItem(Player player, ItemStack item, Block block, EquipmentSlot slot) {
+        EntityPlayer human = ((CraftPlayer) player).getHandle();
+        EnumHand hand = slot == EquipmentSlot.OFF_HAND ? EnumHand.OFF_HAND : EnumHand.MAIN_HAND;
+        net.minecraft.server.v1_14_R1.ItemStack nmsItem = CraftItemStack.asNMSCopy(item);
+        MovingObjectPositionBlock mopb = (MovingObjectPositionBlock) genMOPB(player, block);
 
-        switch (block.getType()) {
-            case GRASS:
-            case TALL_GRASS:
-            case FERN:
-            case LARGE_FERN:
-            case SEAGRASS:
-            case TALL_SEAGRASS:
-            case DEAD_BUSH:
-            case VINE:
-            case FIRE:
-                return true;
-            default:
-                return false;
-        }
+        nmsItem.placeItem(new ItemActionContext(human, hand, mopb), hand);
+    }
+
+    private Object genMOPB(Player player, Block block) {
+        Location source = player.getEyeLocation();
+        EntityHuman human = ((CraftPlayer) player).getHandle();
+        return new MovingObjectPositionBlock(
+                new Vec3D(source.getX(), source.getY(), source.getZ()),
+                human.getDirection(),
+                new BlockPosition(block.getX(), block.getY(), block.getZ()),
+                false
+        );
     }
 }
