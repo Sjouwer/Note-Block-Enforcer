@@ -1,6 +1,5 @@
 package io.github.sjouwer.noteblockenforcer.events;
 
-import net.minecraft.server.v1_14_R1.*;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -14,6 +13,14 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
+
+import net.minecraft.server.v1_14_R1.EntityPlayer;
+import net.minecraft.server.v1_14_R1.EnumHand;
+import net.minecraft.server.v1_14_R1.ItemActionContext;
+import net.minecraft.server.v1_14_R1.MovingObjectPositionBlock;
+import net.minecraft.server.v1_14_R1.EntityHuman;
+import net.minecraft.server.v1_14_R1.Vec3D;
+import net.minecraft.server.v1_14_R1.BlockPosition;
 
 public class NoteBlockInteractEvent implements Listener {
     @EventHandler

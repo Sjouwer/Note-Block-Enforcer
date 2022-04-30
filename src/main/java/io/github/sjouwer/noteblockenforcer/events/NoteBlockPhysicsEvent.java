@@ -8,7 +8,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockPhysicsEvent;
 
 public class NoteBlockPhysicsEvent implements Listener {
-    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
     public void stopNoteBlockPhysics(BlockPhysicsEvent event) {
         Block block = event.getBlock();
         if (block.getType() == Material.NOTE_BLOCK) {
@@ -16,13 +16,15 @@ public class NoteBlockPhysicsEvent implements Listener {
         }
 
         Block blockAbove = block.getLocation().add(0, 1, 0).getBlock();
+        if (blockAbove.getType() != Material.NOTE_BLOCK) {
+            return;
+        }
+
+        event.setCancelled(true);
+        block.getState().update(true, false);
         while (blockAbove.getType() == Material.NOTE_BLOCK) {
-            event.setCancelled(true);
             blockAbove.getState().update(true, true);
             blockAbove = blockAbove.getLocation().add(0, 1, 0).getBlock();
         }
-
-        if (!block.getType().toString().contains("SIGN") && block.getType() != Material.LECTERN)
-            block.getState().update(true, false);
     }
 }
