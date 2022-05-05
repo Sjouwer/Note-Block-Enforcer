@@ -1,5 +1,6 @@
-package io.github.sjouwer.noteblockenforcer.events;
+package io.github.sjouwer.blockenforcer.listeners;
 
+import io.github.sjouwer.blockenforcer.BlockEnforcer;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -23,8 +24,14 @@ import net.minecraft.server.v1_14_R1.Vec3D;
 import net.minecraft.server.v1_14_R1.BlockPosition;
 
 public class NoteBlockInteractEvent implements Listener {
+    private static final boolean OVERRIDE_NOTE_BLOCK_CLICK = BlockEnforcer.getPlugin().getConfig().getBoolean("Override-NoteBlock-Right-Click");
+
     @EventHandler
     public void placeBlockInstead(PlayerInteractEvent event) {
+        if (!OVERRIDE_NOTE_BLOCK_CLICK) {
+            return;
+        }
+
         Block clickedBlock = event.getClickedBlock();
         if (event.getAction() != Action.RIGHT_CLICK_BLOCK || clickedBlock == null || clickedBlock.getType() != Material.NOTE_BLOCK) {
             return;
@@ -36,14 +43,9 @@ public class NoteBlockInteractEvent implements Listener {
         }
 
         event.setCancelled(true);
-
         ItemStack item = event.getItem();
-        if (item == null) {
-            return;
-        }
-
         EquipmentSlot hand = event.getHand();
-        if (hand == null) {
+        if (item == null || hand == null) {
             return;
         }
 

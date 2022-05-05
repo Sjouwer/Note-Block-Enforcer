@@ -1,4 +1,4 @@
-package io.github.sjouwer.noteblockenforcer.events;
+package io.github.sjouwer.blockenforcer.listeners;
 
 import net.minecraft.server.v1_14_R1.NBTTagCompound;
 import org.bukkit.Instrument;
@@ -16,12 +16,8 @@ public class NoteBlockPlaceEvent implements Listener {
     @EventHandler
     public void forceNoteBlockNBTState(BlockPlaceEvent event) {
         Block block = event.getBlockPlaced();
-        if (block.getType() != Material.NOTE_BLOCK) {
-            return;
-        }
-
         ItemStack item = event.getItemInHand();
-        if (item.getType() != Material.NOTE_BLOCK) {
+        if (block.getType() != Material.NOTE_BLOCK || item.getType() != Material.NOTE_BLOCK) {
             return;
         }
 

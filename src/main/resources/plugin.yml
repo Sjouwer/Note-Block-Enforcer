@@ -1,6 +1,6 @@
-name: NoteBlockEnforcer
-version: 1.1.1
-main: "io.github.sjouwer.noteblockenforcer.NoteBlockEnforcer"
+name: BlockEnforcer
+version: 1.0.0
+main: "io.github.sjouwer.blockenforcer.BlockEnforcer"
 
 author: Sjouwer
 
