@@ -19,6 +19,8 @@ public class BlockEnforcer extends JavaPlugin {
         config.addDefault("Enable-BlockState-Picker", true);
         config.addDefault("BlockState-Picker-Tool", "bone");
         config.addDefault("Stop-NoteBlock-Updates", true);
+        config.addDefault("Fix_WE_Wand_Desync", true);
+        config.addDefault("WE-Wand", "wooden_axe");
         config.addDefault("Override-NoteBlock-Right-Click", true);
         config.addDefault("Stop-Falling-Blocks", true);
         config.options().copyDefaults(true);
