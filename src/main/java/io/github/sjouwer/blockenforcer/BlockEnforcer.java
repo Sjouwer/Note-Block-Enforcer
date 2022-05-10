@@ -16,6 +16,7 @@ public class BlockEnforcer extends JavaPlugin {
     @Override
     public void onEnable() {
         BlockEnforcer.plugin = this;
+
         config.addDefault("Enable-BlockState-Picker", true);
         config.addDefault("BlockState-Picker-Tool", "bone");
         config.addDefault("Stop-NoteBlock-Updates", true);
@@ -31,6 +32,7 @@ public class BlockEnforcer extends JavaPlugin {
         Bukkit.getPluginManager().registerEvents(new NoteBlockInteractEvent(), BlockEnforcer.plugin);
         Bukkit.getPluginManager().registerEvents(new FallingBlockSpawnEvent(), BlockEnforcer.plugin);
         Bukkit.getPluginManager().registerEvents(new PickBlockStateEvent(), BlockEnforcer.plugin);
+        Bukkit.getPluginManager().registerEvents(new FlowerPotPlaceEvent(), BlockEnforcer.plugin);
     }
 
     @Override

@@ -16,9 +16,9 @@ public class NoteBlockPhysicsEvent implements Listener {
     private static Material weWand = Material.WOODEN_AXE;
 
     static {
-        String configTool = BlockEnforcer.getPlugin().getConfig().getString("WE-Wand");
-        if (configTool != null) {
-            Material material = Material.getMaterial(configTool.toUpperCase());
+        String configWand = BlockEnforcer.getPlugin().getConfig().getString("WE-Wand");
+        if (configWand != null) {
+            Material material = Material.getMaterial(configWand.toUpperCase());
             if (material != null) {
                 weWand = material;
             }
@@ -47,7 +47,7 @@ public class NoteBlockPhysicsEvent implements Listener {
     }
 
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
-    public void stopWEWandDesync(PlayerInteractEvent event) {
+    public void fixWEWandDesync(PlayerInteractEvent event) {
         if (!FIX_WE_WAND_DESYNC) {
             return;
         }

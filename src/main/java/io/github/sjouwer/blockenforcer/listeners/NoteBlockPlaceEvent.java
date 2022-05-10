@@ -1,7 +1,7 @@
 package io.github.sjouwer.blockenforcer.listeners;
 
+import io.github.sjouwer.blockenforcer.utils.NoteBlockUtil;
 import net.minecraft.server.v1_14_R1.NBTTagCompound;
-import org.bukkit.Instrument;
 import org.bukkit.Material;
 import org.bukkit.Note;
 import org.bukkit.block.Block;
@@ -27,33 +27,12 @@ public class NoteBlockPlaceEvent implements Listener {
             NBTTagCompound blockStateTag = compound.getCompound("BlockStateTag");
             if (!blockStateTag.isEmpty()) {
                 NoteBlock nBlock = (NoteBlock) block.getBlockData();
-                nBlock.setInstrument(getInstrument(blockStateTag.getString("instrument")));
+                nBlock.setInstrument(NoteBlockUtil.getInstrument(blockStateTag.getString("instrument")));
                 nBlock.setNote(new Note(Integer.parseInt(blockStateTag.getString("note"))));
                 nBlock.setPowered(Boolean.parseBoolean(blockStateTag.getString("powered")));
                 block.setBlockData(nBlock);
                 block.getState().update(true);
             }
-        }
-    }
-
-    private Instrument getInstrument(String nbtInstrument) {
-        switch (nbtInstrument) {
-            case "BASEDRUM": return Instrument.BASS_DRUM;
-            case "SNARE": return Instrument.SNARE_DRUM;
-            case "HAT": return Instrument.STICKS;
-            case "BASS": return Instrument.BASS_GUITAR;
-            case "FLUTE": return Instrument.FLUTE;
-            case "BELL": return Instrument.BELL;
-            case "GUITAR": return Instrument.GUITAR;
-            case "CHIME": return Instrument.CHIME;
-            case "XYLOPHONE": return Instrument.XYLOPHONE;
-            case "IRON_XYLOPHONE": return Instrument.IRON_XYLOPHONE;
-            case "COW_BELL": return Instrument.COW_BELL;
-            case "DIDGERIDOO": return Instrument.DIDGERIDOO;
-            case "BIT": return Instrument.BIT;
-            case "BANJO": return Instrument.BANJO;
-            case "PLING": return Instrument.PLING;
-            default: return Instrument.PIANO;
         }
     }
 }

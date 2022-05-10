@@ -5,6 +5,7 @@ This is a plugin to aid with special texture packs that uses, among other things
 - Stops any neighbor updates from changing the note block BlockStates
 - Removes the ability to change the note of a note block with a right click, instead it allows for placing a block
 - Prevents falling blocks from falling down
+- Adds ability to place down potted plants with renamed Flower Pots
 
 The BlockState picker is also part of my [Pick Block Pro mod](https://github.com/Sjouwer/pick-block-pro) which doesn't require a tool, is fully client side and instead works by holding ALT while block picking. This plugin however doesn't require players to install the mod.
 
