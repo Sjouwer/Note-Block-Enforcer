@@ -112,18 +112,18 @@ public class BlockStatePicker {
         return nmsWorld.getType(blockPos);
     }
 
-    private ItemStack convertToStack(org.bukkit.Material material) {
+    private ItemStack convertToStack(Material material) {
         switch (material) {
-            case BRAIN_CORAL_WALL_FAN: return new ItemStack(org.bukkit.Material.BRAIN_CORAL_FAN);
-            case BUBBLE_CORAL_WALL_FAN: return new ItemStack(org.bukkit.Material.BUBBLE_CORAL_FAN);
-            case FIRE_CORAL_WALL_FAN: return new ItemStack(org.bukkit.Material.FIRE_CORAL_FAN);
-            case HORN_CORAL_WALL_FAN: return new ItemStack(org.bukkit.Material.HORN_CORAL_FAN);
-            case TUBE_CORAL_WALL_FAN: return new ItemStack(org.bukkit.Material.TUBE_CORAL_FAN);
-            case DEAD_BRAIN_CORAL_WALL_FAN: return new ItemStack(org.bukkit.Material.DEAD_BRAIN_CORAL_FAN);
-            case DEAD_BUBBLE_CORAL_WALL_FAN: return new ItemStack(org.bukkit.Material.DEAD_BUBBLE_CORAL_FAN);
-            case DEAD_FIRE_CORAL_WALL_FAN: return new ItemStack(org.bukkit.Material.DEAD_FIRE_CORAL_FAN);
-            case DEAD_HORN_CORAL_WALL_FAN: return new ItemStack(org.bukkit.Material.DEAD_HORN_CORAL_FAN);
-            case DEAD_TUBE_CORAL_WALL_FAN: return new ItemStack(org.bukkit.Material.DEAD_TUBE_CORAL_FAN);
+            case BRAIN_CORAL_WALL_FAN: return new ItemStack(Material.BRAIN_CORAL_FAN);
+            case BUBBLE_CORAL_WALL_FAN: return new ItemStack(Material.BUBBLE_CORAL_FAN);
+            case FIRE_CORAL_WALL_FAN: return new ItemStack(Material.FIRE_CORAL_FAN);
+            case HORN_CORAL_WALL_FAN: return new ItemStack(Material.HORN_CORAL_FAN);
+            case TUBE_CORAL_WALL_FAN: return new ItemStack(Material.TUBE_CORAL_FAN);
+            case DEAD_BRAIN_CORAL_WALL_FAN: return new ItemStack(Material.DEAD_BRAIN_CORAL_FAN);
+            case DEAD_BUBBLE_CORAL_WALL_FAN: return new ItemStack(Material.DEAD_BUBBLE_CORAL_FAN);
+            case DEAD_FIRE_CORAL_WALL_FAN: return new ItemStack(Material.DEAD_FIRE_CORAL_FAN);
+            case DEAD_HORN_CORAL_WALL_FAN: return new ItemStack(Material.DEAD_HORN_CORAL_FAN);
+            case DEAD_TUBE_CORAL_WALL_FAN: return new ItemStack(Material.DEAD_TUBE_CORAL_FAN);
             default: return null;
         }
     }
