@@ -6,6 +6,8 @@ import io.github.sjouwer.blockenforcer.utils.NoteBlockUtil;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.type.NoteBlock;
+import org.bukkit.block.data.type.PistonHead;
+import org.bukkit.block.data.type.TechnicalPiston;
 import org.bukkit.craftbukkit.v1_14_R1.CraftWorld;
 import org.bukkit.craftbukkit.v1_14_R1.inventory.CraftItemStack;
 import org.bukkit.entity.Player;
@@ -44,6 +46,10 @@ public class BlockStatePicker {
         if (clickedMaterial.isItem()) {
             pickedItem = new ItemStack(clickedMaterial);
         }
+        else if (clickedMaterial == Material.PISTON_HEAD) {
+            givePistonHead(clickedBlock, player);
+            return;
+        }
         else {
             Optional<ItemStack> optionalItem = clickedBlock.getDrops().stream().findFirst();
             pickedItem = optionalItem.orElseGet(() -> convertToStack(clickedMaterial));
@@ -54,18 +60,14 @@ public class BlockStatePicker {
         }
 
         pickedItem = addBlockStateNbt(pickedItem, clickedBlock);
-        if (pickedItem.getType() == Material.FLOWER_POT || pickedItem.getType() == Material.NOTE_BLOCK) {
-            ItemMeta itemMeta = pickedItem.getItemMeta();
-            if (itemMeta != null) {
-                if (pickedItem.getType() == Material.FLOWER_POT) {
-                    itemMeta.setDisplayName(FlowerPotUtil.convertToName(clickedMaterial));
-                }
-                if (pickedItem.getType() == Material.NOTE_BLOCK && clickedMaterial == Material.NOTE_BLOCK ) {
-                    itemMeta.setDisplayName(NoteBlockUtil.getName((NoteBlock) clickedBlock.getBlockData()));
-                }
-
-                pickedItem.setItemMeta(itemMeta);
-            }
+        if (pickedItem.getType() == Material.FLOWER_POT) {
+            nameItemStack(pickedItem, FlowerPotUtil.convertToName(clickedMaterial));
+        }
+        if (pickedItem.getType() == Material.NOTE_BLOCK && clickedMaterial == Material.NOTE_BLOCK ) {
+            nameItemStack(pickedItem, NoteBlockUtil.getName((NoteBlock) clickedBlock.getBlockData()));
+        }
+        if (pickedItem.getType() == Material.ICE && clickedMaterial == Material.FROSTED_ICE ) {
+            nameItemStack(pickedItem, "Frosted Ice");
         }
 
         player.getInventory().setItem(getInventorySlot(player), pickedItem);
@@ -83,6 +85,31 @@ public class BlockStatePicker {
         }
 
         return slot;
+    }
+
+    private void nameItemStack(ItemStack item, String name) {
+        ItemMeta itemMeta = item.getItemMeta();
+        if (itemMeta != null) {
+            itemMeta.setDisplayName(name);
+            item.setItemMeta(itemMeta);
+        }
+    }
+
+    private void givePistonHead(Block clickedBlock, Player player) {
+        ItemStack pickedItem;
+        PistonHead pistonHead = ((PistonHead) clickedBlock.getBlockData());
+        TechnicalPiston.Type type = pistonHead.getType();
+        if (type == TechnicalPiston.Type.STICKY) {
+            pickedItem = new ItemStack(Material.STICKY_PISTON);
+            nameItemStack(pickedItem, pistonHead.isShort() ? "Short Sticky Piston Head" : "Sticky Piston Head");
+        }
+        else {
+            pickedItem = new ItemStack(Material.PISTON);
+            nameItemStack(pickedItem, pistonHead.isShort() ? "Short Piston Head" : "Piston Head");
+        }
+
+        player.getInventory().setItem(getInventorySlot(player), pickedItem);
+        player.updateInventory();
     }
 
     private ItemStack addBlockStateNbt(ItemStack stack, Block block) {
@@ -124,6 +151,7 @@ public class BlockStatePicker {
             case DEAD_FIRE_CORAL_WALL_FAN: return new ItemStack(Material.DEAD_FIRE_CORAL_FAN);
             case DEAD_HORN_CORAL_WALL_FAN: return new ItemStack(Material.DEAD_HORN_CORAL_FAN);
             case DEAD_TUBE_CORAL_WALL_FAN: return new ItemStack(Material.DEAD_TUBE_CORAL_FAN);
+            case FROSTED_ICE: return new ItemStack(Material.ICE);
             default: return null;
         }
     }

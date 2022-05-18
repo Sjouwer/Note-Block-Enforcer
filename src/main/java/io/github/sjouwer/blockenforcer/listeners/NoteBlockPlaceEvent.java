@@ -1,12 +1,12 @@
 package io.github.sjouwer.blockenforcer.listeners;
 
+import io.github.sjouwer.blockenforcer.utils.BlockStateUtil;
 import io.github.sjouwer.blockenforcer.utils.NoteBlockUtil;
 import net.minecraft.server.v1_14_R1.NBTTagCompound;
 import org.bukkit.Material;
 import org.bukkit.Note;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.type.NoteBlock;
-import org.bukkit.craftbukkit.v1_14_R1.inventory.CraftItemStack;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockPlaceEvent;
@@ -21,18 +21,14 @@ public class NoteBlockPlaceEvent implements Listener {
             return;
         }
 
-        net.minecraft.server.v1_14_R1.ItemStack nmsStack = CraftItemStack.asNMSCopy(item);
-        if (nmsStack.hasTag()) {
-            NBTTagCompound compound = nmsStack.getTag();
-            NBTTagCompound blockStateTag = compound.getCompound("BlockStateTag");
-            if (!blockStateTag.isEmpty()) {
-                NoteBlock nBlock = (NoteBlock) block.getBlockData();
-                nBlock.setInstrument(NoteBlockUtil.getInstrument(blockStateTag.getString("instrument")));
-                nBlock.setNote(new Note(Integer.parseInt(blockStateTag.getString("note"))));
-                nBlock.setPowered(Boolean.parseBoolean(blockStateTag.getString("powered")));
-                block.setBlockData(nBlock);
-                block.getState().update(true);
-            }
+        NBTTagCompound blockStateTag = BlockStateUtil.getBlockStateTag(item);
+        if (blockStateTag != null) {
+            NoteBlock noteBlock = (NoteBlock) block.getBlockData();
+            noteBlock.setInstrument(NoteBlockUtil.getInstrument(blockStateTag.getString("instrument")));
+            noteBlock.setNote(new Note(Integer.parseInt(blockStateTag.getString("note"))));
+            noteBlock.setPowered(Boolean.parseBoolean(blockStateTag.getString("powered")));
+            block.setBlockData(noteBlock);
+            block.getState().update(true);
         }
     }
 }
