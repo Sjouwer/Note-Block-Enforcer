@@ -5,6 +5,7 @@ This is a plugin to aid with special texture packs that uses, among other things
 - Stops any neighbor updates from changing the note block BlockStates
 - Removes the ability to change the note of a note block with a right click, instead it allows for placing a block
 - Prevents falling blocks from falling down
+- Disables Chorus Plant placement rules, allowing to place them everywhere
 - Adds ability to place down Potted Plants with renamed Flower Pots
 - Adds ability to place down Piston Heads with renamed (Sticky) Pistons
 - Adds ability to place down Frosted Ice with renamed Ice
