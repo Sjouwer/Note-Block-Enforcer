@@ -34,16 +34,15 @@ public class NoteBlockPhysicsEvent implements Listener {
         Block block = event.getBlock();
         if (block.getType() == Material.NOTE_BLOCK) {
             event.setCancelled(true);
+            block.getState().update(true, false);
         }
 
         Block blockAbove = block.getLocation().add(0, 1, 0).getBlock();
-        if (blockAbove.getType() != Material.NOTE_BLOCK) {
-            return;
+        if (blockAbove.getType() == Material.NOTE_BLOCK) {
+            updateAllAboveNoteBlocks(blockAbove);
+            event.setCancelled(true);
+            block.getState().update(true, false);
         }
-
-        event.setCancelled(true);
-        block.getState().update(true, false);
-        updateNoteBlocks(blockAbove);
     }
 
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
@@ -57,10 +56,10 @@ public class NoteBlockPhysicsEvent implements Listener {
         }
 
         Block blockAbove = event.getClickedBlock().getLocation().add(0, 1, 0).getBlock();
-        updateNoteBlocks(blockAbove);
+        updateAllAboveNoteBlocks(blockAbove);
     }
 
-    private void updateNoteBlocks(Block blockAbove) {
+    private void updateAllAboveNoteBlocks(Block blockAbove) {
         while (blockAbove.getType() == Material.NOTE_BLOCK) {
             blockAbove.getState().update(true, true);
             blockAbove = blockAbove.getLocation().add(0, 1, 0).getBlock();

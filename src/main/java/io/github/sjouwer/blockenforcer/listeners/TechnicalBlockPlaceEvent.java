@@ -30,8 +30,8 @@ public class TechnicalBlockPlaceEvent implements Listener {
             return;
         }
 
-        block.setType(FlowerPotUtil.convertToMaterial(itemMeta.getDisplayName()));
-        block.getState().update(true);
+        block.setType(FlowerPotUtil.convertToMaterial(itemMeta.getDisplayName()), false);
+        block.getState().update(true, false);
     }
 
     @EventHandler
@@ -47,15 +47,15 @@ public class TechnicalBlockPlaceEvent implements Listener {
             return;
         }
 
-        block.setType(Material.FROSTED_ICE);
+        block.setType(Material.FROSTED_ICE, false);
         NBTTagCompound blockStateTag = BlockStateUtil.getBlockStateTag(item);
         if (blockStateTag != null) {
             Ageable frostBlock = (Ageable) block.getBlockData();
             frostBlock.setAge(Integer.parseInt(blockStateTag.getString("age")));
-            block.setBlockData(frostBlock);
+            block.setBlockData(frostBlock, false);
         }
 
-        block.getState().update(true);
+        block.getState().update(true, false);
     }
 
     @EventHandler
@@ -73,7 +73,7 @@ public class TechnicalBlockPlaceEvent implements Listener {
 
         String displayName = itemMeta.getDisplayName();
         BlockFace facing = ((Piston) block.getBlockData()).getFacing();
-        block.setType(Material.PISTON_HEAD);
+        block.setType(Material.PISTON_HEAD, false);
         PistonHead pistonBlock = (PistonHead) block.getBlockData();
         pistonBlock.setFacing(facing);
         pistonBlock.setShort(displayName.contains("Short"));
@@ -81,7 +81,7 @@ public class TechnicalBlockPlaceEvent implements Listener {
             pistonBlock.setType(TechnicalPiston.Type.STICKY);
         }
 
-        block.setBlockData(pistonBlock);
-        block.getState().update(true);
+        block.setBlockData(pistonBlock, false);
+        block.getState().update(true, false);
     }
 }
