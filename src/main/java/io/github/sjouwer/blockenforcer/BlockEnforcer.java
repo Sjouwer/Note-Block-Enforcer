@@ -36,6 +36,7 @@ public class BlockEnforcer extends JavaPlugin {
         Bukkit.getPluginManager().registerEvents(new TechnicalBlockPlaceEvent(), BlockEnforcer.plugin);
         Bukkit.getPluginManager().registerEvents(new ChorusPhysicsEvent(), BlockEnforcer.plugin);
         Bukkit.getPluginManager().registerEvents(new ChorusPlaceEvent(), BlockEnforcer.plugin);
+        Bukkit.getPluginManager().registerEvents(new BiomeBlockPlaceEvent(), BlockEnforcer.plugin);
     }
 
     @Override

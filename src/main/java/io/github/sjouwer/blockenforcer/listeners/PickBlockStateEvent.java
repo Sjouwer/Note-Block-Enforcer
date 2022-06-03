@@ -29,7 +29,7 @@ public class PickBlockStateEvent implements Listener {
 
         Player player = event.getPlayer();
         ItemStack item = event.getItem();
-        if (player.isSneaking() || player.getGameMode() != GameMode.CREATIVE || item == null || item.getType() != picker.getTool() || event.getHand() != EquipmentSlot.HAND) {
+        if (player.getGameMode() != GameMode.CREATIVE || item == null || item.getType() != picker.getTool() || event.getHand() != EquipmentSlot.HAND) {
             return;
         }
 

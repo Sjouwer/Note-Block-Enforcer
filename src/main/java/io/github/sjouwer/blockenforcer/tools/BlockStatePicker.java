@@ -17,10 +17,10 @@ import org.bukkit.inventory.meta.ItemMeta;
 
 import net.minecraft.server.v1_14_R1.IBlockData;
 import net.minecraft.server.v1_14_R1.NBTTagCompound;
-import net.minecraft.server.v1_14_R1.NBTTagList;
-import net.minecraft.server.v1_14_R1.NBTTagString;
 import net.minecraft.server.v1_14_R1.BlockPosition;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 public class BlockStatePicker {
@@ -70,6 +70,11 @@ public class BlockStatePicker {
             nameItemStack(pickedItem, "Frosted Ice");
         }
 
+        //Add biome to item when player is sneaking
+        if (player.isSneaking()) {
+            addLore(pickedItem, clickedBlock.getBiome().name());
+        }
+
         player.getInventory().setItem(getInventorySlot(player), pickedItem);
         player.updateInventory();
     }
@@ -91,6 +96,22 @@ public class BlockStatePicker {
         ItemMeta itemMeta = item.getItemMeta();
         if (itemMeta != null) {
             itemMeta.setDisplayName(name);
+            item.setItemMeta(itemMeta);
+        }
+    }
+
+    private void addLore(ItemStack item, String lore) {
+        ItemMeta itemMeta = item.getItemMeta();
+        if (itemMeta != null) {
+            List<String> loreList;
+            if (itemMeta.hasLore()) {
+                loreList = itemMeta.getLore();
+            }
+            else {
+                loreList = new ArrayList<>();
+            }
+            loreList.add(lore);
+            itemMeta.setLore(loreList);
             item.setItemMeta(itemMeta);
         }
     }
@@ -122,14 +143,10 @@ public class BlockStatePicker {
         }
 
         nmsStack.a("BlockStateTag", propertiesTag);
+        ItemStack nbtStack = CraftItemStack.asBukkitCopy(nmsStack);
+        addLore(nbtStack, "(+BlockState NBT)");
 
-        NBTTagCompound loreTag = new NBTTagCompound();
-        NBTTagList nbtList = new NBTTagList();
-        nbtList.add(new NBTTagString("\"(+BlockState NBT)\""));
-        loreTag.set("Lore", nbtList);
-        nmsStack.a("display", loreTag);
-
-        return CraftItemStack.asBukkitCopy(nmsStack);
+        return nbtStack;
     }
 
     private IBlockData toNMSBlock(Block block) {
