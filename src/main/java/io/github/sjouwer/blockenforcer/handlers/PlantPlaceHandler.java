@@ -4,7 +4,9 @@ import io.github.sjouwer.blockenforcer.utils.BlockUtil;
 import net.minecraft.server.v1_14_R1.NBTTagCompound;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.Ageable;
+import org.bukkit.block.data.Bisected;
 import org.bukkit.block.data.type.Bamboo;
 import org.bukkit.block.data.type.Bamboo.Leaves;
 import org.bukkit.block.data.type.Sapling;
@@ -25,7 +27,46 @@ public class PlantPlaceHandler {
     }
 
     public static void forcePlaceDoublePlant(PlayerInteractEvent event) {
+        ItemStack item = event.getItem();
+        if (item == null) {
+            return;
+        }
 
+        Block placedBlock = BlockPlaceHandler.placeBlock(event);
+        if (placedBlock == null) {
+            return;
+        }
+
+        event.setCancelled(true);
+
+        NBTTagCompound blockStateTag = BlockUtil.getBlockStateTag(item);
+        if (blockStateTag != null) {
+            setPlantHalf(placedBlock, stringToHalf(blockStateTag.getString("half")));
+            return;
+        }
+
+        Block plantTopBlock = placedBlock.getRelative(BlockFace.UP, 1);
+        if (BlockUtil.isReplaceable(plantTopBlock)) {
+            placedBlock = BlockPlaceHandler.placeBlock(event, plantTopBlock);
+            if (placedBlock == null) {
+                return;
+            }
+            setPlantHalf(placedBlock, Bisected.Half.TOP);
+        }
+    }
+
+    private static void setPlantHalf(Block block, Bisected.Half half) {
+        Bisected halfPlant = (Bisected) block.getBlockData();
+        halfPlant.setHalf(half);
+        block.setBlockData(halfPlant);
+        block.getState().update(true);
+    }
+
+    public static Bisected.Half stringToHalf(String string) {
+        if (string.equalsIgnoreCase("upper") || string.equalsIgnoreCase("top")) {
+            return Bisected.Half.TOP;
+        }
+        return Bisected.Half.BOTTOM;
     }
 
     public static void forcePlaceAgingPlant(PlayerInteractEvent event) {

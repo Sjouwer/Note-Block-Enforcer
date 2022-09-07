@@ -15,13 +15,17 @@ public class BlockPlaceHandler {
     }
 
     public static Block placeBlock(PlayerInteractEvent event) {
+        return BlockPlaceHandler.placeBlock(event, null);
+    }
+
+    public static Block placeBlock(PlayerInteractEvent event, Block blockOverride) {
         Block clickedBlock = event.getClickedBlock();
         ItemStack item = event.getItem();
         if (clickedBlock == null || item == null || event.getHand() == null) {
             return null;
         }
 
-        Block placementBlock = getPlacementBlock(clickedBlock, event.getBlockFace());
+        Block placementBlock = blockOverride == null ? getPlacementBlock(clickedBlock, event.getBlockFace()) : blockOverride;
         if (placementBlock == null) {
             return null;
         }
