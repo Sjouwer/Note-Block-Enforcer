@@ -24,7 +24,7 @@ public class BlockEnforcer extends JavaPlugin {
         config.addDefault("WE-Wand", "wooden_axe");
         config.addDefault("Override-NoteBlock-Right-Click", true);
         config.addDefault("Stop-Falling-Blocks", true);
-        config.addDefault("Disable-Chorus-Placement-Rules", true);
+        config.addDefault("Disable-Plant-Placement-Rules", true);
         config.options().copyDefaults(true);
         saveConfig();
 
@@ -35,7 +35,7 @@ public class BlockEnforcer extends JavaPlugin {
         Bukkit.getPluginManager().registerEvents(new PickBlockStateEvent(), BlockEnforcer.plugin);
         Bukkit.getPluginManager().registerEvents(new TechnicalBlockPlaceEvent(), BlockEnforcer.plugin);
         Bukkit.getPluginManager().registerEvents(new ChorusPhysicsEvent(), BlockEnforcer.plugin);
-        Bukkit.getPluginManager().registerEvents(new ChorusPlaceEvent(), BlockEnforcer.plugin);
+        Bukkit.getPluginManager().registerEvents(new PlantPlaceEvent(), BlockEnforcer.plugin);
         Bukkit.getPluginManager().registerEvents(new BiomeBlockPlaceEvent(), BlockEnforcer.plugin);
     }
 

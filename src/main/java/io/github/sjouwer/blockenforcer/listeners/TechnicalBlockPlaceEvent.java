@@ -1,6 +1,6 @@
 package io.github.sjouwer.blockenforcer.listeners;
 
-import io.github.sjouwer.blockenforcer.utils.BlockStateUtil;
+import io.github.sjouwer.blockenforcer.utils.BlockUtil;
 import io.github.sjouwer.blockenforcer.utils.FlowerPotUtil;
 import net.minecraft.server.v1_14_R1.NBTTagCompound;
 import org.bukkit.Material;
@@ -48,7 +48,7 @@ public class TechnicalBlockPlaceEvent implements Listener {
         }
 
         block.setType(Material.FROSTED_ICE, false);
-        NBTTagCompound blockStateTag = BlockStateUtil.getBlockStateTag(item);
+        NBTTagCompound blockStateTag = BlockUtil.getBlockStateTag(item);
         if (blockStateTag != null) {
             Ageable frostBlock = (Ageable) block.getBlockData();
             frostBlock.setAge(Integer.parseInt(blockStateTag.getString("age")));

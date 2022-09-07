@@ -14,7 +14,6 @@ import org.bukkit.inventory.ItemStack;
 
 public class PickBlockStateEvent implements Listener {
     private static final boolean ENABLE_BLOCKSTATE_PICKER = BlockEnforcer.getPlugin().getConfig().getBoolean("Enable-BlockState-Picker");
-    private static final BlockStatePicker picker = new BlockStatePicker();
 
     @EventHandler
     public void getBlockStateItem(PlayerInteractEvent event) {
@@ -23,17 +22,19 @@ public class PickBlockStateEvent implements Listener {
         }
 
         Block clickedBlock = event.getClickedBlock();
-        if (event.getAction() != Action.RIGHT_CLICK_BLOCK || clickedBlock == null) {
-            return;
-        }
-
         Player player = event.getPlayer();
         ItemStack item = event.getItem();
-        if (player.getGameMode() != GameMode.CREATIVE || item == null || item.getType() != picker.getTool() || event.getHand() != EquipmentSlot.HAND) {
+        if (player.getGameMode() != GameMode.CREATIVE ||
+                clickedBlock == null ||
+                item == null ||
+                item.getType() != BlockStatePicker.getTool() ||
+                event.getHand() != EquipmentSlot.HAND) {
             return;
         }
 
         event.setCancelled(true);
-        picker.pickBlockState(clickedBlock, player);
+        if (event.getAction() == Action.LEFT_CLICK_BLOCK) {
+            BlockStatePicker.pickBlockState(clickedBlock, player);
+        }
     }
 }

@@ -1,6 +1,6 @@
 package io.github.sjouwer.blockenforcer.listeners;
 
-import io.github.sjouwer.blockenforcer.utils.BlockStateUtil;
+import io.github.sjouwer.blockenforcer.utils.BlockUtil;
 import io.github.sjouwer.blockenforcer.utils.NoteBlockUtil;
 import net.minecraft.server.v1_14_R1.NBTTagCompound;
 import org.bukkit.Material;
@@ -21,7 +21,7 @@ public class NoteBlockPlaceEvent implements Listener {
             return;
         }
 
-        NBTTagCompound blockStateTag = BlockStateUtil.getBlockStateTag(item);
+        NBTTagCompound blockStateTag = BlockUtil.getBlockStateTag(item);
         if (blockStateTag != null) {
             NoteBlock noteBlock = (NoteBlock) block.getBlockData();
             noteBlock.setInstrument(NoteBlockUtil.getInstrument(blockStateTag.getString("instrument")));
