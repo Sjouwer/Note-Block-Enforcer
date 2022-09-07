@@ -2,6 +2,7 @@ package io.github.sjouwer.blockenforcer.listeners;
 
 import io.github.sjouwer.blockenforcer.BlockEnforcer;
 import io.github.sjouwer.blockenforcer.tools.BlockStatePicker;
+import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
@@ -34,6 +35,11 @@ public class PickBlockStateEvent implements Listener {
 
         event.setCancelled(true);
         if (event.getAction() == Action.LEFT_CLICK_BLOCK) {
+            BlockStatePicker.provideBlockInfo(clickedBlock, player);
+            return;
+        }
+
+        if (event.getAction() == Action.RIGHT_CLICK_BLOCK) {
             BlockStatePicker.pickBlockState(clickedBlock, player);
         }
     }

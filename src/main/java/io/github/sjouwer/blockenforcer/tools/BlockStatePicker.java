@@ -5,6 +5,7 @@ import io.github.sjouwer.blockenforcer.utils.BlockUtil;
 import io.github.sjouwer.blockenforcer.utils.FlowerPotUtil;
 import io.github.sjouwer.blockenforcer.utils.ItemUtil;
 import io.github.sjouwer.blockenforcer.utils.NoteBlockUtil;
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.type.NoteBlock;
@@ -35,6 +36,17 @@ public class BlockStatePicker {
 
     public static Material getTool() {
         return tool;
+    }
+
+    public static void provideBlockInfo(Block clickedBlock, Player player) {
+        player.sendMessage("----------Block Info----------");
+        player.sendMessage(ChatColor.LIGHT_PURPLE + "Block: " + clickedBlock.getType().name().toLowerCase());
+
+        player.sendMessage(ChatColor.AQUA + "States: ");
+        BlockUtil.toNMSBlock(clickedBlock).getStateMap().forEach((key, value) ->
+                player.sendMessage(ChatColor.AQUA + key.a() + " = " + value.toString()));
+
+        player.sendMessage(ChatColor.GREEN + "Biome: " + clickedBlock.getBiome().name().toLowerCase());
     }
 
     public static void pickBlockState(Block clickedBlock, Player player) {
