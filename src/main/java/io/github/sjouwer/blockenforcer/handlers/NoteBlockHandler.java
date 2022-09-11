@@ -1,4 +1,4 @@
-package io.github.sjouwer.blockenforcer.listeners;
+package io.github.sjouwer.blockenforcer.handlers;
 
 import io.github.sjouwer.blockenforcer.utils.BlockUtil;
 import io.github.sjouwer.blockenforcer.utils.NoteBlockUtil;
@@ -6,18 +6,16 @@ import net.minecraft.server.v1_14_R1.NBTTagCompound;
 import org.bukkit.Material;
 import org.bukkit.Note;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.type.NoteBlock;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
-import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.inventory.ItemStack;
 
-public class NoteBlockPlaceEvent implements Listener {
-    @EventHandler
-    public void forceNoteBlockNBTState(BlockPlaceEvent event) {
-        Block block = event.getBlockPlaced();
-        ItemStack item = event.getItemInHand();
-        if (block.getType() != Material.NOTE_BLOCK || item.getType() != Material.NOTE_BLOCK) {
+public class NoteBlockHandler {
+    private NoteBlockHandler() {
+    }
+
+    public static void forceNoteBlockNBTState(ItemStack item, Block block) {
+        if (item.getType() != Material.NOTE_BLOCK) {
             return;
         }
 
@@ -29,6 +27,13 @@ public class NoteBlockPlaceEvent implements Listener {
             noteBlock.setPowered(Boolean.parseBoolean(blockStateTag.getString("powered")));
             block.setBlockData(noteBlock);
             block.getState().update(true);
+        }
+    }
+
+    public static void updateAllAboveNoteBlocks(Block blockAbove) {
+        while (blockAbove.getType() == Material.NOTE_BLOCK) {
+            blockAbove.getState().update(true, true);
+            blockAbove = blockAbove.getRelative(BlockFace.UP, 1);
         }
     }
 }

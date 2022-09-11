@@ -6,6 +6,7 @@ import io.github.sjouwer.blockenforcer.utils.FlowerPotUtil;
 import io.github.sjouwer.blockenforcer.utils.ItemUtil;
 import io.github.sjouwer.blockenforcer.utils.NoteBlockUtil;
 import org.bukkit.ChatColor;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.type.NoteBlock;

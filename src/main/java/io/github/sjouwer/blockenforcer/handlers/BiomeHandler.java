@@ -1,24 +1,18 @@
-package io.github.sjouwer.blockenforcer.listeners;
+package io.github.sjouwer.blockenforcer.handlers;
 
 import io.github.sjouwer.blockenforcer.packets.PacketWorldChunk;
 import org.bukkit.block.Biome;
 import org.bukkit.block.Block;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
-import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.List;
 
-public class BiomeBlockPlaceEvent implements Listener {
-    @EventHandler
-    public void changeBiome(BlockPlaceEvent event) {
-        ItemMeta meta = event.getItemInHand().getItemMeta();
-        if (meta == null || !meta.hasLore()) {
-            return;
-        }
+public class BiomeHandler {
+    private BiomeHandler() {
+    }
 
-        Block block = event.getBlockPlaced();
+    public static void changeBiome(Block block, ItemMeta meta, Player player) {
         List<String> loreList = meta.getLore();
         for (String lore : loreList) {
             try {
@@ -28,14 +22,12 @@ public class BiomeBlockPlaceEvent implements Listener {
                 }
 
                 block.setBiome(biome);
-                PacketWorldChunk.send(block.getChunk(), event.getPlayer());
+                PacketWorldChunk.send(block.getChunk(), player);
                 return;
             }
             catch (IllegalArgumentException e) {
                 //The lore wasn't a biome
             }
         }
-
     }
-
 }

@@ -8,15 +8,11 @@ import org.bukkit.block.data.MultipleFacing;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerInteractEvent;
 
-public class ChorusPlaceHandler {
-    private ChorusPlaceHandler() {
+public class ChorusHandler {
+    private ChorusHandler() {
     }
 
     public static void forcePlaceChorusPlant(PlayerInteractEvent event) {
-        if (event.getItem() == null) {
-            return;
-        }
-
         Block placedBlock = BlockPlaceHandler.placeBlock(event);
         if (placedBlock == null) {
             return;

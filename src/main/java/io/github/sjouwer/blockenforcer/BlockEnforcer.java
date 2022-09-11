@@ -28,15 +28,9 @@ public class BlockEnforcer extends JavaPlugin {
         config.options().copyDefaults(true);
         saveConfig();
 
-        Bukkit.getPluginManager().registerEvents(new NoteBlockPlaceEvent(), BlockEnforcer.plugin);
-        Bukkit.getPluginManager().registerEvents(new NoteBlockPhysicsEvent(), BlockEnforcer.plugin);
-        Bukkit.getPluginManager().registerEvents(new NoteBlockInteractEvent(), BlockEnforcer.plugin);
-        Bukkit.getPluginManager().registerEvents(new FallingBlockSpawnEvent(), BlockEnforcer.plugin);
-        Bukkit.getPluginManager().registerEvents(new PickBlockStateEvent(), BlockEnforcer.plugin);
-        Bukkit.getPluginManager().registerEvents(new TechnicalBlockPlaceEvent(), BlockEnforcer.plugin);
-        Bukkit.getPluginManager().registerEvents(new ChorusPhysicsEvent(), BlockEnforcer.plugin);
-        Bukkit.getPluginManager().registerEvents(new PlantPlaceEvent(), BlockEnforcer.plugin);
-        Bukkit.getPluginManager().registerEvents(new BiomeBlockPlaceEvent(), BlockEnforcer.plugin);
+        Bukkit.getPluginManager().registerEvents(new BlockPhysicsListener(), BlockEnforcer.plugin);
+        Bukkit.getPluginManager().registerEvents(new BlockPlaceListener(), BlockEnforcer.plugin);
+        Bukkit.getPluginManager().registerEvents(new PlayerInteractListener(), BlockEnforcer.plugin);
     }
 
     @Override

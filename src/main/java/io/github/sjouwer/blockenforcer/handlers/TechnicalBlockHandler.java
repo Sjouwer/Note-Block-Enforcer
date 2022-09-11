@@ -1,4 +1,4 @@
-package io.github.sjouwer.blockenforcer.listeners;
+package io.github.sjouwer.blockenforcer.handlers;
 
 import io.github.sjouwer.blockenforcer.utils.BlockUtil;
 import io.github.sjouwer.blockenforcer.utils.FlowerPotUtil;
@@ -10,18 +10,15 @@ import org.bukkit.block.data.Ageable;
 import org.bukkit.block.data.type.Piston;
 import org.bukkit.block.data.type.PistonHead;
 import org.bukkit.block.data.type.TechnicalPiston;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
-import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-public class TechnicalBlockPlaceEvent implements Listener {
-    @EventHandler
-    public void placePottedPlant(BlockPlaceEvent event) {
-        Block block = event.getBlockPlaced();
-        ItemStack item = event.getItemInHand();
-        if (block.getType() != Material.FLOWER_POT || item.getType() != Material.FLOWER_POT) {
+public class TechnicalBlockHandler {
+    private TechnicalBlockHandler() {
+    }
+
+    public static void placePottedPlant(ItemStack item, Block block) {
+        if (item.getType() != Material.FLOWER_POT) {
             return;
         }
 
@@ -34,11 +31,8 @@ public class TechnicalBlockPlaceEvent implements Listener {
         block.getState().update(true, false);
     }
 
-    @EventHandler
-    public void placeFrostedIce(BlockPlaceEvent event) {
-        Block block = event.getBlockPlaced();
-        ItemStack item = event.getItemInHand();
-        if (block.getType() != Material.ICE || item.getType() != Material.ICE) {
+    public static void placeFrostedIce(ItemStack item, Block block) {
+        if (item.getType() != Material.ICE) {
             return;
         }
 
@@ -58,11 +52,8 @@ public class TechnicalBlockPlaceEvent implements Listener {
         block.getState().update(true, false);
     }
 
-    @EventHandler
-    public void placePistonHead(BlockPlaceEvent event) {
-        Block block = event.getBlockPlaced();
-        ItemStack item = event.getItemInHand();
-        if ((block.getType() != Material.STICKY_PISTON || item.getType() != Material.STICKY_PISTON) && (block.getType() != Material.PISTON || item.getType() != Material.PISTON)) {
+    public static void placePistonHead(ItemStack item, Block block) {
+        if (item.getType() != Material.STICKY_PISTON && item.getType() != Material.PISTON) {
             return;
         }
 
