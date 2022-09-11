@@ -1,10 +1,7 @@
 package io.github.sjouwer.blockenforcer.listeners;
 
 import io.github.sjouwer.blockenforcer.BlockEnforcer;
-import io.github.sjouwer.blockenforcer.handlers.BlockPlaceHandler;
-import io.github.sjouwer.blockenforcer.handlers.ChorusHandler;
-import io.github.sjouwer.blockenforcer.handlers.NoteBlockHandler;
-import io.github.sjouwer.blockenforcer.handlers.PlantHandler;
+import io.github.sjouwer.blockenforcer.handlers.*;
 import io.github.sjouwer.blockenforcer.tools.BlockStatePicker;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -47,6 +44,7 @@ public class PlayerInteractListener implements Listener {
 
         statePickerCheck(event);
         plantPlaceCheck(event);
+        railPlaceCheck(event);
     }
 
     private void noteBlockClickCheck(PlayerInteractEvent event) {
@@ -142,6 +140,24 @@ public class PlayerInteractListener implements Listener {
 
                 case BAMBOO:
                     PlantHandler.forcePlaceBamboo(event);
+                    break;
+
+                default:
+            }
+        }
+    }
+
+    private void railPlaceCheck(PlayerInteractEvent event) {
+        if (event.getAction() == Action.RIGHT_CLICK_BLOCK) {
+            switch (event.getItem().getType()) {
+                case RAIL:
+                    RailHandler.forcePlaceRail(event, false);
+                    break;
+
+                case ACTIVATOR_RAIL:
+                case DETECTOR_RAIL:
+                case POWERED_RAIL:
+                    RailHandler.forcePlaceRail(event, true);
                     break;
 
                 default:
