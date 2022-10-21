@@ -54,7 +54,7 @@ public class PlantHandler {
         Bisected halfPlant = (Bisected) block.getBlockData();
         halfPlant.setHalf(half);
         block.setBlockData(halfPlant);
-        block.getState().update(true);
+        block.getState().update(true, false);
     }
 
     public static Bisected.Half stringToHalf(String string) {

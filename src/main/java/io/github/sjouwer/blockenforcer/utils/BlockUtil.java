@@ -62,14 +62,15 @@ public class BlockUtil {
     public static ItemStack convertToStack(Block block) {
         ItemStack stack;
         Material blockMaterial = block.getType();
-        if (blockMaterial.isItem()) {
-            stack = new ItemStack(blockMaterial);
-            return stack;
-        }
 
         Material itemMaterial = materialBiMap.getOrDefault(blockMaterial, null);
         if (itemMaterial != null) {
             stack = new ItemStack(itemMaterial);
+            return stack;
+        }
+
+        if (blockMaterial.isItem()) {
+            stack = new ItemStack(blockMaterial);
             return stack;
         }
 

@@ -79,6 +79,10 @@ public class PlayerInteractListener implements Listener {
 
     private void plantPlaceCheck(PlayerInteractEvent event) {
         if (DISABLE_PLANT_PLACEMENT_RULES && event.getAction() == Action.RIGHT_CLICK_BLOCK) {
+            if (event.getClickedBlock().getType() == Material.FLOWER_POT) {
+                return;
+            }
+
             switch (event.getItem().getType()) {
                 case GRASS:
                 case FERN:
