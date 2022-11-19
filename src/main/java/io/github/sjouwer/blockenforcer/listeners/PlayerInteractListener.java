@@ -16,6 +16,7 @@ import org.bukkit.inventory.EquipmentSlot;
 public class PlayerInteractListener implements Listener {
     private static final boolean ENABLE_BLOCKSTATE_PICKER = BlockEnforcer.getPlugin().getConfig().getBoolean("Enable-BlockState-Picker");
     private static final boolean DISABLE_PLANT_PLACEMENT_RULES = BlockEnforcer.getPlugin().getConfig().getBoolean("Disable-Plant-Placement-Rules");
+    private static final boolean STOP_TURTLE_EGG_UPDATES = BlockEnforcer.getPlugin().getConfig().getBoolean("Stop-Turtle-Egg-Updates");
     private static final boolean OVERRIDE_NOTE_BLOCK_CLICK = BlockEnforcer.getPlugin().getConfig().getBoolean("Override-NoteBlock-Right-Click");
     private static final boolean FIX_WE_WAND_DESYNC = BlockEnforcer.getPlugin().getConfig().getBoolean("Fix_WE_Wand_Desync");
     private static Material weWand = Material.WOODEN_AXE;
@@ -32,7 +33,13 @@ public class PlayerInteractListener implements Listener {
 
     @EventHandler
     public void onPlayerInteractEvent(PlayerInteractEvent event) {
-        if (event.getClickedBlock() == null || event.getHand() == null) {
+        if (event.getClickedBlock() == null) {
+            return;
+        }
+
+        turtleEggBreakingCheck(event);
+
+        if (event.getHand() == null) {
             return;
         }
 
@@ -45,6 +52,14 @@ public class PlayerInteractListener implements Listener {
         statePickerCheck(event);
         plantPlaceCheck(event);
         railPlaceCheck(event);
+    }
+
+    private void turtleEggBreakingCheck(PlayerInteractEvent event) {
+        if (STOP_TURTLE_EGG_UPDATES &&
+                event.getAction() == Action.PHYSICAL &&
+                event.getClickedBlock().getType() == Material.TURTLE_EGG) {
+            event.setCancelled(true);
+        }
     }
 
     private void noteBlockClickCheck(PlayerInteractEvent event) {
@@ -102,7 +117,6 @@ public class PlayerInteractListener implements Listener {
                 case WITHER_ROSE:
                 case RED_MUSHROOM:
                 case BROWN_MUSHROOM:
-                case LILY_PAD:
                     PlantHandler.forcePlacePlant(event);
                     break;
 
