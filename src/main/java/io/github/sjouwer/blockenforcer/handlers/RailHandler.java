@@ -11,7 +11,7 @@ public class RailHandler {
     private RailHandler() {
     }
 
-    public static void forcePlaceRail(PlayerInteractEvent event, boolean powered) {
+    public static void forcePlaceRail(PlayerInteractEvent event, boolean canBePowered) {
         NBTTagCompound blockStateTag = BlockUtil.getBlockStateTag(event.getItem());
         if (blockStateTag == null) {
             return;
@@ -22,7 +22,7 @@ public class RailHandler {
             return;
         }
 
-        if (powered) {
+        if (canBePowered) {
             setRailPower(placedBlock, blockStateTag);
         }
 

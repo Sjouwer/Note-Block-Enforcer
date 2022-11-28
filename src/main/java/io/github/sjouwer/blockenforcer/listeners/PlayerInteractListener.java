@@ -16,6 +16,7 @@ import org.bukkit.inventory.EquipmentSlot;
 public class PlayerInteractListener implements Listener {
     private static final boolean ENABLE_BLOCKSTATE_PICKER = BlockEnforcer.getPlugin().getConfig().getBoolean("Enable-BlockState-Picker");
     private static final boolean DISABLE_PLANT_PLACEMENT_RULES = BlockEnforcer.getPlugin().getConfig().getBoolean("Disable-Plant-Placement-Rules");
+    private static final boolean STOP_TRIPWIRE_UPDATES = BlockEnforcer.getPlugin().getConfig().getBoolean("Stop-Tripwire-Updates");
     private static final boolean STOP_TURTLE_EGG_UPDATES = BlockEnforcer.getPlugin().getConfig().getBoolean("Stop-Turtle-Egg-Updates");
     private static final boolean OVERRIDE_NOTE_BLOCK_CLICK = BlockEnforcer.getPlugin().getConfig().getBoolean("Override-NoteBlock-Right-Click");
     private static final boolean FIX_WE_WAND_DESYNC = BlockEnforcer.getPlugin().getConfig().getBoolean("Fix_WE_Wand_Desync");
@@ -37,6 +38,7 @@ public class PlayerInteractListener implements Listener {
             return;
         }
 
+        tripwireUpdateCheck(event);
         turtleEggBreakingCheck(event);
 
         if (event.getHand() == null) {
@@ -52,6 +54,14 @@ public class PlayerInteractListener implements Listener {
         statePickerCheck(event);
         plantPlaceCheck(event);
         railPlaceCheck(event);
+    }
+
+    public void tripwireUpdateCheck(PlayerInteractEvent event) {
+        if (STOP_TRIPWIRE_UPDATES &&
+                event.getAction() == Action.PHYSICAL &&
+                event.getClickedBlock().getType() == Material.TRIPWIRE) {
+            event.setCancelled(true);
+        }
     }
 
     private void turtleEggBreakingCheck(PlayerInteractEvent event) {

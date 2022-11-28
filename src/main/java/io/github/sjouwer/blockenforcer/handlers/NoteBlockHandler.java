@@ -26,13 +26,13 @@ public class NoteBlockHandler {
             noteBlock.setNote(new Note(Integer.parseInt(blockStateTag.getString("note"))));
             noteBlock.setPowered(Boolean.parseBoolean(blockStateTag.getString("powered")));
             block.setBlockData(noteBlock);
-            block.getState().update(true);
+            block.getState().update(true, false);
         }
     }
 
     public static void updateAllAboveNoteBlocks(Block blockAbove) {
         while (blockAbove.getType() == Material.NOTE_BLOCK) {
-            blockAbove.getState().update(true, true);
+            blockAbove.getState().update(true, false);
             blockAbove = blockAbove.getRelative(BlockFace.UP, 1);
         }
     }
