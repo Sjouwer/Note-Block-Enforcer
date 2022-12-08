@@ -45,7 +45,8 @@ public class TechnicalBlockHandler {
         NBTTagCompound blockStateTag = BlockUtil.getBlockStateTag(item);
         if (blockStateTag != null) {
             Ageable frostBlock = (Ageable) block.getBlockData();
-            frostBlock.setAge(Integer.parseInt(blockStateTag.getString("age")));
+            String age = blockStateTag.getString("age");
+            if (!age.isEmpty()) frostBlock.setAge(Integer.parseInt(age));
             block.setBlockData(frostBlock, false);
         }
 

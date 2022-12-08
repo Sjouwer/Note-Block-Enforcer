@@ -22,9 +22,16 @@ public class NoteBlockHandler {
         NBTTagCompound blockStateTag = BlockUtil.getBlockStateTag(item);
         if (blockStateTag != null) {
             NoteBlock noteBlock = (NoteBlock) block.getBlockData();
-            noteBlock.setInstrument(NoteBlockUtil.getInstrument(blockStateTag.getString("instrument")));
-            noteBlock.setNote(new Note(Integer.parseInt(blockStateTag.getString("note"))));
-            noteBlock.setPowered(Boolean.parseBoolean(blockStateTag.getString("powered")));
+
+            String instrument = blockStateTag.getString("instrument");
+            if (!instrument.isEmpty()) noteBlock.setInstrument(NoteBlockUtil.getInstrument(instrument));
+
+            String note = blockStateTag.getString("note");
+            if (!note.isEmpty()) noteBlock.setNote(new Note(Integer.parseInt(note)));
+
+            String powered = blockStateTag.getString("powered");
+            if (!powered.isEmpty()) noteBlock.setPowered(Boolean.parseBoolean(powered));
+
             block.setBlockData(noteBlock);
             block.getState().update(true, false);
         }

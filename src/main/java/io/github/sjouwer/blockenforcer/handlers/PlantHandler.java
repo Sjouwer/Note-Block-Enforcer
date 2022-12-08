@@ -36,7 +36,8 @@ public class PlantHandler {
 
         NBTTagCompound blockStateTag = BlockUtil.getBlockStateTag(event.getItem());
         if (blockStateTag != null) {
-            setPlantHalf(placedBlock, stringToHalf(blockStateTag.getString("half")));
+            String half = blockStateTag.getString("half");
+            if (!half.isEmpty()) setPlantHalf(placedBlock, stringToHalf(half));
             return;
         }
 
@@ -51,10 +52,12 @@ public class PlantHandler {
     }
 
     private static void setPlantHalf(Block block, Bisected.Half half) {
-        Bisected halfPlant = (Bisected) block.getBlockData();
-        halfPlant.setHalf(half);
-        block.setBlockData(halfPlant);
-        block.getState().update(true, false);
+        if (block.getBlockData() instanceof Bisected) {
+            Bisected halfPlant = (Bisected) block.getBlockData();
+            halfPlant.setHalf(half);
+            block.setBlockData(halfPlant);
+            block.getState().update(true);
+        }
     }
 
     public static Bisected.Half stringToHalf(String string) {
@@ -82,17 +85,20 @@ public class PlantHandler {
 
         NBTTagCompound blockStateTag = BlockUtil.getBlockStateTag(stack);
         if (blockStateTag != null){
-            return Integer.parseInt(blockStateTag.getString("age"));
+            String age = blockStateTag.getString("age");
+            if (!age.isEmpty()) return Integer.parseInt(age);
         }
 
         return 0;
     }
 
     private static void setPlantAge(Block block, int age) {
-        Ageable plant = (Ageable) block.getBlockData();
-        plant.setAge(age);
-        block.setBlockData(plant);
-        block.getState().update(true);
+        if (block.getBlockData() instanceof Ageable) {
+            Ageable plant = (Ageable) block.getBlockData();
+            plant.setAge(age);
+            block.setBlockData(plant);
+            block.getState().update(true);
+        }
     }
 
     public static void forcePlaceSapling(PlayerInteractEvent event) {
@@ -104,7 +110,10 @@ public class PlantHandler {
         NBTTagCompound blockStateTag = BlockUtil.getBlockStateTag(event.getItem());
         if (blockStateTag != null) {
             Sapling sapling = (Sapling) placedBlock.getBlockData();
-            sapling.setStage(Integer.parseInt(blockStateTag.getString("stage")));
+
+            String stage = blockStateTag.getString("stage");
+            if (!stage.isEmpty()) sapling.setStage(Integer.parseInt(stage));
+
             placedBlock.setBlockData(sapling);
             placedBlock.getState().update(true);
         }
@@ -121,9 +130,16 @@ public class PlantHandler {
         NBTTagCompound blockStateTag = BlockUtil.getBlockStateTag(event.getItem());
         if (blockStateTag != null) {
             Bamboo bamboo = (Bamboo) placedBlock.getBlockData();
-            bamboo.setAge(Integer.parseInt(blockStateTag.getString("age")));
-            bamboo.setStage(Integer.parseInt(blockStateTag.getString("stage")));
-            bamboo.setLeaves(stringToLeaves(blockStateTag.getString("leaves")));
+
+            String age = blockStateTag.getString("age");
+            if (!age.isEmpty()) bamboo.setAge(Integer.parseInt(age));
+
+            String stage = blockStateTag.getString("stage");
+            if (!stage.isEmpty()) bamboo.setStage(Integer.parseInt(stage));
+
+            String leaves = blockStateTag.getString("leaves");
+            if (!leaves.isEmpty()) bamboo.setLeaves(stringToLeaves(leaves));
+
             placedBlock.setBlockData(bamboo);
             placedBlock.getState().update(true);
         }

@@ -67,7 +67,7 @@ public class PlayerInteractListener implements Listener {
         }
 
         plantPlaceCheck(event);
-        railPlaceCheck(event);
+        forcePlaceCheck(event);
     }
 
     public void doorUpdateCheck(PlayerInteractEvent event) {
@@ -199,17 +199,14 @@ public class PlayerInteractListener implements Listener {
         }
     }
 
-    private void railPlaceCheck(PlayerInteractEvent event) {
+    private void forcePlaceCheck(PlayerInteractEvent event) {
         if (event.getAction() == Action.RIGHT_CLICK_BLOCK) {
             switch (event.getItem().getType()) {
                 case RAIL:
-                    RailHandler.forcePlaceRail(event, false);
-                    break;
-
                 case ACTIVATOR_RAIL:
                 case DETECTOR_RAIL:
                 case POWERED_RAIL:
-                    RailHandler.forcePlaceRail(event, true);
+                    RedstoneBlockHandler.forcePlaceRail(event);
                     break;
 
                 default:
