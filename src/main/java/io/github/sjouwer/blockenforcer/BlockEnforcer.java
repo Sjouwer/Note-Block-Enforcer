@@ -21,6 +21,7 @@ public class BlockEnforcer extends JavaPlugin {
         config.addDefault("BlockState-Picker-Tool", "bone");
         config.addDefault("Stop-NoteBlock-Updates", true);
         config.addDefault("Stop-Tripwire-Updates", true);
+        config.addDefault("Stop-Door-Updates", true);
         config.addDefault("Stop-Turtle-Egg-Updates", true);
         config.addDefault("Fix_WE_Wand_Desync", true);
         config.addDefault("WE-Wand", "wooden_axe");

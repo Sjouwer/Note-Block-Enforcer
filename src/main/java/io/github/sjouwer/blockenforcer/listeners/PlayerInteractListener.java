@@ -4,8 +4,10 @@ import io.github.sjouwer.blockenforcer.BlockEnforcer;
 import io.github.sjouwer.blockenforcer.handlers.*;
 import io.github.sjouwer.blockenforcer.tools.BlockStatePicker;
 import org.bukkit.Material;
+import org.bukkit.Tag;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
+import org.bukkit.block.data.type.Door;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -17,6 +19,7 @@ public class PlayerInteractListener implements Listener {
     private static final boolean ENABLE_BLOCKSTATE_PICKER = BlockEnforcer.getPlugin().getConfig().getBoolean("Enable-BlockState-Picker");
     private static final boolean DISABLE_PLANT_PLACEMENT_RULES = BlockEnforcer.getPlugin().getConfig().getBoolean("Disable-Plant-Placement-Rules");
     private static final boolean STOP_TRIPWIRE_UPDATES = BlockEnforcer.getPlugin().getConfig().getBoolean("Stop-Tripwire-Updates");
+    private static final boolean STOP_DOOR_UPDATES = BlockEnforcer.getPlugin().getConfig().getBoolean("Stop-Door-Updates");
     private static final boolean STOP_TURTLE_EGG_UPDATES = BlockEnforcer.getPlugin().getConfig().getBoolean("Stop-Turtle-Egg-Updates");
     private static final boolean OVERRIDE_NOTE_BLOCK_CLICK = BlockEnforcer.getPlugin().getConfig().getBoolean("Override-NoteBlock-Right-Click");
     private static final boolean FIX_WE_WAND_DESYNC = BlockEnforcer.getPlugin().getConfig().getBoolean("Fix_WE_Wand_Desync");
@@ -32,7 +35,7 @@ public class PlayerInteractListener implements Listener {
         }
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onPlayerInteractEvent(PlayerInteractEvent event) {
         if (event.getClickedBlock() == null) {
             return;
@@ -46,20 +49,44 @@ public class PlayerInteractListener implements Listener {
         }
 
         noteBlockClickCheck(event);
+        doorUpdateCheck(event);
 
         if (event.getItem() == null) {
             return;
         }
 
         statePickerCheck(event);
+
+        Material type = event.getClickedBlock().getType();
+        if (type.isInteractable() &&
+                type != Material.NOTE_BLOCK &&
+                !Tag.FENCES.isTagged(type) &&
+                !Tag.STAIRS.isTagged(type) &&
+                !event.getPlayer().isSneaking()) {
+            return;
+        }
+
         plantPlaceCheck(event);
         railPlaceCheck(event);
+    }
+
+    public void doorUpdateCheck(PlayerInteractEvent event) {
+        if (STOP_DOOR_UPDATES &&
+                event.getAction() == Action.RIGHT_CLICK_BLOCK &&
+                event.getClickedBlock().getBlockData() instanceof Door &&
+                event.getHand() == EquipmentSlot.HAND &&
+                (event.getItem() == null || !event.getPlayer().isSneaking())) {
+
+            RedstoneBlockHandler.openDoorWithoutOtherChanges(event.getClickedBlock());
+            event.setCancelled(true);
+        }
     }
 
     public void tripwireUpdateCheck(PlayerInteractEvent event) {
         if (STOP_TRIPWIRE_UPDATES &&
                 event.getAction() == Action.PHYSICAL &&
                 event.getClickedBlock().getType() == Material.TRIPWIRE) {
+
             event.setCancelled(true);
         }
     }
@@ -68,6 +95,7 @@ public class PlayerInteractListener implements Listener {
         if (STOP_TURTLE_EGG_UPDATES &&
                 event.getAction() == Action.PHYSICAL &&
                 event.getClickedBlock().getType() == Material.TURTLE_EGG) {
+
             event.setCancelled(true);
         }
     }
@@ -76,8 +104,8 @@ public class PlayerInteractListener implements Listener {
         if (OVERRIDE_NOTE_BLOCK_CLICK &&
                 event.getClickedBlock().getType() == Material.NOTE_BLOCK &&
                 event.getAction() == Action.RIGHT_CLICK_BLOCK &&
-                (event.getItem() == null || !event.getPlayer().isSneaking())
-        ) {
+                (event.getItem() == null || !event.getPlayer().isSneaking())) {
+
             event.setCancelled(true);
             if (event.getItem() != null) {
                 BlockPlaceHandler.forcePlayerToPlaceBlock(event.getPlayer(), event.getItem(), event.getClickedBlock().getRelative(event.getBlockFace()), event.getHand());
@@ -88,9 +116,9 @@ public class PlayerInteractListener implements Listener {
     private void statePickerCheck(PlayerInteractEvent event) {
         if (ENABLE_BLOCKSTATE_PICKER &&
                 event.getItem().getType() == BlockStatePicker.getTool() &&
-                event.getHand() == EquipmentSlot.HAND
-        ) {
+                event.getHand() == EquipmentSlot.HAND) {
             event.setCancelled(true);
+
             if (event.getAction() == Action.LEFT_CLICK_BLOCK) {
                 BlockStatePicker.provideBlockInfo(event.getClickedBlock(), event.getPlayer());
                 return;
@@ -104,10 +132,6 @@ public class PlayerInteractListener implements Listener {
 
     private void plantPlaceCheck(PlayerInteractEvent event) {
         if (DISABLE_PLANT_PLACEMENT_RULES && event.getAction() == Action.RIGHT_CLICK_BLOCK) {
-            if (event.getClickedBlock().getType() == Material.FLOWER_POT) {
-                return;
-            }
-
             switch (event.getItem().getType()) {
                 case GRASS:
                 case FERN:
@@ -192,15 +216,14 @@ public class PlayerInteractListener implements Listener {
             }
         }
     }
-
-    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+    
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void onWEWandDesync(PlayerInteractEvent event) {
         if (FIX_WE_WAND_DESYNC &&
                 event.getAction() == Action.LEFT_CLICK_BLOCK &&
                 event.getClickedBlock() != null &&
                 event.getItem() != null &&
-                event.getItem().getType() == weWand
-        ) {
+                event.getItem().getType() == weWand) {
             Block blockAbove = event.getClickedBlock().getRelative(BlockFace.UP, 1);
             NoteBlockHandler.updateAllAboveNoteBlocks(blockAbove);
         }
