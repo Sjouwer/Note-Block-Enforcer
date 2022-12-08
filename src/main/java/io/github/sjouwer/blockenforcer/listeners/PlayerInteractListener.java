@@ -57,20 +57,24 @@ public class PlayerInteractListener implements Listener {
 
         statePickerCheck(event);
 
-        Material type = event.getClickedBlock().getType();
-        if (type.isInteractable() &&
-                type != Material.NOTE_BLOCK &&
-                !Tag.FENCES.isTagged(type) &&
-                !Tag.STAIRS.isTagged(type) &&
-                !event.getPlayer().isSneaking()) {
+        if (isInteractable(event.getClickedBlock()) && !event.getPlayer().isSneaking()) {
             return;
         }
 
+        blockPlaceCheck(event);
         plantPlaceCheck(event);
-        forcePlaceCheck(event);
     }
 
-    public void doorUpdateCheck(PlayerInteractEvent event) {
+    private boolean isInteractable(Block block) {
+        Material type = block.getType();
+        return type.isInteractable() &&
+                type != Material.NOTE_BLOCK &&
+                type != Material.CAKE &&
+                !Tag.FENCES.isTagged(type) &&
+                !Tag.STAIRS.isTagged(type);
+    }
+
+    private void doorUpdateCheck(PlayerInteractEvent event) {
         if (STOP_DOOR_UPDATES &&
                 event.getAction() == Action.RIGHT_CLICK_BLOCK &&
                 event.getClickedBlock().getBlockData() instanceof Door &&
@@ -82,7 +86,7 @@ public class PlayerInteractListener implements Listener {
         }
     }
 
-    public void tripwireUpdateCheck(PlayerInteractEvent event) {
+    private void tripwireUpdateCheck(PlayerInteractEvent event) {
         if (STOP_TRIPWIRE_UPDATES &&
                 event.getAction() == Action.PHYSICAL &&
                 event.getClickedBlock().getType() == Material.TRIPWIRE) {
@@ -130,6 +134,25 @@ public class PlayerInteractListener implements Listener {
         }
     }
 
+    private void blockPlaceCheck(PlayerInteractEvent event) {
+        if (event.getAction() == Action.RIGHT_CLICK_BLOCK) {
+            switch (event.getItem().getType()) {
+                case RAIL:
+                case ACTIVATOR_RAIL:
+                case DETECTOR_RAIL:
+                case POWERED_RAIL:
+                    RedstoneBlockHandler.forcePlaceRail(event);
+                    break;
+
+                case CAKE:
+                    GeneralBlockHandler.forcePlaceCake(event);
+                    break;
+
+                default:
+            }
+        }
+    }
+
     private void plantPlaceCheck(PlayerInteractEvent event) {
         if (DISABLE_PLANT_PLACEMENT_RULES && event.getAction() == Action.RIGHT_CLICK_BLOCK) {
             switch (event.getItem().getType()) {
@@ -151,7 +174,7 @@ public class PlayerInteractListener implements Listener {
                 case WITHER_ROSE:
                 case RED_MUSHROOM:
                 case BROWN_MUSHROOM:
-                    PlantHandler.forcePlacePlant(event);
+                    GeneralBlockHandler.forcePlaceBlock(event);
                     break;
 
                 case WHEAT_SEEDS:
@@ -192,21 +215,6 @@ public class PlayerInteractListener implements Listener {
 
                 case BAMBOO:
                     PlantHandler.forcePlaceBamboo(event);
-                    break;
-
-                default:
-            }
-        }
-    }
-
-    private void forcePlaceCheck(PlayerInteractEvent event) {
-        if (event.getAction() == Action.RIGHT_CLICK_BLOCK) {
-            switch (event.getItem().getType()) {
-                case RAIL:
-                case ACTIVATOR_RAIL:
-                case DETECTOR_RAIL:
-                case POWERED_RAIL:
-                    RedstoneBlockHandler.forcePlaceRail(event);
                     break;
 
                 default:

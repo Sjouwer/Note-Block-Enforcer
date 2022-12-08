@@ -17,15 +17,6 @@ public class PlantHandler {
     private PlantHandler() {
     }
 
-    public static void forcePlacePlant(PlayerInteractEvent event) {
-        Block placementBlock = BlockPlaceHandler.placeBlock(event);
-        if (placementBlock == null) {
-            return;
-        }
-
-        event.setCancelled(true);
-    }
-
     public static void forcePlaceDoublePlant(PlayerInteractEvent event) {
         Block placedBlock = BlockPlaceHandler.placeBlock(event);
         if (placedBlock == null) {
