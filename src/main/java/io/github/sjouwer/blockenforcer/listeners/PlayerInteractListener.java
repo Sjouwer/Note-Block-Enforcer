@@ -148,6 +148,10 @@ public class PlayerInteractListener implements Listener {
                     GeneralBlockHandler.forcePlaceCake(event);
                     break;
 
+                case SEA_PICKLE:
+                    GeneralBlockHandler.forcePlaceSeaPickle(event);
+                    break;
+
                 default:
             }
         }

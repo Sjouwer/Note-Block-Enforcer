@@ -9,6 +9,7 @@ import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
+import org.bukkit.block.data.Waterlogged;
 import org.bukkit.craftbukkit.v1_14_R1.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_14_R1.inventory.CraftItemStack;
 import org.bukkit.entity.Player;
@@ -40,7 +41,15 @@ public class BlockPlaceHandler {
         }
 
         BlockState replacedBlockState = placementBlock.getState();
+
+        boolean waterLogged = placementBlock.getType() == Material.WATER;
         placementBlock.setType(blockMaterial, false);
+        if (placementBlock.getBlockData() instanceof Waterlogged) {
+            Waterlogged waterLoggable = ((Waterlogged) placementBlock.getBlockData());
+            waterLoggable.setWaterlogged(waterLogged);
+            placementBlock.setBlockData(waterLoggable);
+        }
+
         BlockPlaceEvent blockPlaceEvent = new BlockPlaceEvent(placementBlock, replacedBlockState, clickedBlock, item, event.getPlayer(), true, event.getHand());
         Bukkit.getPluginManager().callEvent(blockPlaceEvent);
         if (blockPlaceEvent.isCancelled()) {
