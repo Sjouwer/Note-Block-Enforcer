@@ -1,6 +1,6 @@
 package io.github.sjouwer.blockenforcer.listeners;
 
-import io.github.sjouwer.blockenforcer.BlockEnforcer;
+import io.github.sjouwer.blockenforcer.Config;
 import io.github.sjouwer.blockenforcer.handlers.*;
 import io.github.sjouwer.blockenforcer.tools.BlockStatePicker;
 import org.bukkit.Material;
@@ -16,24 +16,6 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
 
 public class PlayerInteractListener implements Listener {
-    private static final boolean ENABLE_BLOCKSTATE_PICKER = BlockEnforcer.getPlugin().getConfig().getBoolean("Enable-BlockState-Picker");
-    private static final boolean DISABLE_PLANT_PLACEMENT_RULES = BlockEnforcer.getPlugin().getConfig().getBoolean("Disable-Plant-Placement-Rules");
-    private static final boolean STOP_TRIPWIRE_UPDATES = BlockEnforcer.getPlugin().getConfig().getBoolean("Stop-Tripwire-Updates");
-    private static final boolean STOP_DOOR_UPDATES = BlockEnforcer.getPlugin().getConfig().getBoolean("Stop-Door-Updates");
-    private static final boolean STOP_TURTLE_EGG_UPDATES = BlockEnforcer.getPlugin().getConfig().getBoolean("Stop-Turtle-Egg-Updates");
-    private static final boolean OVERRIDE_NOTE_BLOCK_CLICK = BlockEnforcer.getPlugin().getConfig().getBoolean("Override-NoteBlock-Right-Click");
-    private static final boolean FIX_WE_WAND_DESYNC = BlockEnforcer.getPlugin().getConfig().getBoolean("Fix_WE_Wand_Desync");
-    private static Material weWand = Material.WOODEN_AXE;
-
-    static {
-        String configWand = BlockEnforcer.getPlugin().getConfig().getString("WE-Wand");
-        if (configWand != null) {
-            Material material = Material.getMaterial(configWand.toUpperCase());
-            if (material != null) {
-                weWand = material;
-            }
-        }
-    }
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onPlayerInteractEvent(PlayerInteractEvent event) {
@@ -75,7 +57,7 @@ public class PlayerInteractListener implements Listener {
     }
 
     private void doorUpdateCheck(PlayerInteractEvent event) {
-        if (STOP_DOOR_UPDATES &&
+        if (Config.STOP_DOOR_UPDATES &&
                 event.getAction() == Action.RIGHT_CLICK_BLOCK &&
                 event.getClickedBlock().getBlockData() instanceof Door &&
                 event.getHand() == EquipmentSlot.HAND &&
@@ -87,7 +69,7 @@ public class PlayerInteractListener implements Listener {
     }
 
     private void tripwireUpdateCheck(PlayerInteractEvent event) {
-        if (STOP_TRIPWIRE_UPDATES &&
+        if (Config.STOP_TRIPWIRE_UPDATES &&
                 event.getAction() == Action.PHYSICAL &&
                 event.getClickedBlock().getType() == Material.TRIPWIRE) {
 
@@ -96,7 +78,7 @@ public class PlayerInteractListener implements Listener {
     }
 
     private void turtleEggBreakingCheck(PlayerInteractEvent event) {
-        if (STOP_TURTLE_EGG_UPDATES &&
+        if (Config.STOP_TURTLE_EGG_UPDATES &&
                 event.getAction() == Action.PHYSICAL &&
                 event.getClickedBlock().getType() == Material.TURTLE_EGG) {
 
@@ -105,7 +87,7 @@ public class PlayerInteractListener implements Listener {
     }
 
     private void noteBlockClickCheck(PlayerInteractEvent event) {
-        if (OVERRIDE_NOTE_BLOCK_CLICK &&
+        if (Config.OVERRIDE_NOTE_BLOCK_CLICK &&
                 event.getClickedBlock().getType() == Material.NOTE_BLOCK &&
                 event.getAction() == Action.RIGHT_CLICK_BLOCK &&
                 (event.getItem() == null || !event.getPlayer().isSneaking())) {
@@ -118,8 +100,8 @@ public class PlayerInteractListener implements Listener {
     }
 
     private void statePickerCheck(PlayerInteractEvent event) {
-        if (ENABLE_BLOCKSTATE_PICKER &&
-                event.getItem().getType() == BlockStatePicker.getTool() &&
+        if (Config.ENABLE_BLOCKSTATE_PICKER &&
+                event.getItem().getType() == Config.getPickerTool() &&
                 event.getHand() == EquipmentSlot.HAND) {
             event.setCancelled(true);
 
@@ -144,6 +126,10 @@ public class PlayerInteractListener implements Listener {
                     RedstoneBlockHandler.forcePlaceRail(event);
                     break;
 
+                case REDSTONE:
+                    RedstoneBlockHandler.forcePlaceRedstone(event);
+                    break;
+
                 case CAKE:
                     GeneralBlockHandler.forcePlaceCake(event);
                     break;
@@ -158,7 +144,7 @@ public class PlayerInteractListener implements Listener {
     }
 
     private void plantPlaceCheck(PlayerInteractEvent event) {
-        if (DISABLE_PLANT_PLACEMENT_RULES && event.getAction() == Action.RIGHT_CLICK_BLOCK) {
+        if (Config.DISABLE_PLANT_PLACEMENT_RULES && event.getAction() == Action.RIGHT_CLICK_BLOCK) {
             switch (event.getItem().getType()) {
                 case GRASS:
                 case FERN:
@@ -228,11 +214,11 @@ public class PlayerInteractListener implements Listener {
     
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onWEWandDesync(PlayerInteractEvent event) {
-        if (FIX_WE_WAND_DESYNC &&
+        if (Config.FIX_WE_WAND_DESYNC &&
                 event.getAction() == Action.LEFT_CLICK_BLOCK &&
                 event.getClickedBlock() != null &&
                 event.getItem() != null &&
-                event.getItem().getType() == weWand) {
+                event.getItem().getType() == Config.getWEWand()) {
             Block blockAbove = event.getClickedBlock().getRelative(BlockFace.UP, 1);
             NoteBlockHandler.updateAllAboveNoteBlocks(blockAbove);
         }

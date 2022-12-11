@@ -1,47 +1,112 @@
 package io.github.sjouwer.blockenforcer.handlers;
 
-import io.github.sjouwer.blockenforcer.BlockEnforcer;
+import io.github.sjouwer.blockenforcer.packets.PacketWorldChunk;
 import io.github.sjouwer.blockenforcer.utils.BlockUtil;
 import net.minecraft.server.v1_14_R1.NBTTagCompound;
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.Bisected;
-import org.bukkit.block.data.BlockData;
 import org.bukkit.block.data.Powerable;
 import org.bukkit.block.data.Rail;
 import org.bukkit.block.data.type.Door;
+import org.bukkit.block.data.type.RedstoneWire;
 import org.bukkit.block.data.type.TripwireHook;
+import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class RedstoneBlockHandler {
+    private static final List<Block> updatedRedstone = new ArrayList<>();
+
     private RedstoneBlockHandler() {
     }
 
-    public static void setPowered(Block block, boolean poweredState) {
-        if (block.getBlockData() instanceof Powerable) {
-            Powerable powerable = (Powerable) block.getBlockData();
-            powerable.setPowered(poweredState);
-            block.setBlockData(powerable);
+    public static void forcePlaceRedstone(PlayerInteractEvent event) {
+        Block placedBlock = BlockPlaceHandler.placeBlock(event);
+        if (placedBlock == null) {
+            return;
+        }
+
+        placedBlock.getState().update(true, true);
+        event.setCancelled(true);
+    }
+
+    public static void forceRedstoneNBTState(ItemStack item, Block block) {
+        if (item.getType() != Material.REDSTONE) {
+            return;
+        }
+
+        NBTTagCompound blockStateTag = BlockUtil.getBlockStateTag(item);
+        if (blockStateTag != null) {
+            RedstoneWire redstoneWire = (RedstoneWire) block.getBlockData();
+
+            String note = blockStateTag.getString("power");
+            if (!note.isEmpty()) redstoneWire.setPower(Integer.parseInt(note));
+
+            String north = blockStateTag.getString("north").toUpperCase();
+            if (!north.isEmpty()) redstoneWire.setFace(BlockFace.NORTH, RedstoneWire.Connection.valueOf(north));
+
+            String east = blockStateTag.getString("east").toUpperCase();
+            if (!north.isEmpty()) redstoneWire.setFace(BlockFace.EAST, RedstoneWire.Connection.valueOf(east));
+
+            String south = blockStateTag.getString("south").toUpperCase();
+            if (!north.isEmpty()) redstoneWire.setFace(BlockFace.SOUTH, RedstoneWire.Connection.valueOf(south));
+
+            String west = blockStateTag.getString("west").toUpperCase();
+            if (!north.isEmpty()) redstoneWire.setFace(BlockFace.WEST, RedstoneWire.Connection.valueOf(west));
+
+            block.setBlockData(redstoneWire);
+            block.getState().update(true, false);
         }
     }
 
     public static void stopTripwireChange(Block block) {
-        scheduleTripwireUpdate(block.getRelative(BlockFace.NORTH));
-        scheduleTripwireUpdate(block.getRelative(BlockFace.EAST));
-        scheduleTripwireUpdate(block.getRelative(BlockFace.SOUTH));
-        scheduleTripwireUpdate(block.getRelative(BlockFace.WEST));
+        GeneralBlockHandler.scheduleBlockUpdate(block.getRelative(BlockFace.NORTH), Material.TRIPWIRE);
+        GeneralBlockHandler.scheduleBlockUpdate(block.getRelative(BlockFace.EAST), Material.TRIPWIRE);
+        GeneralBlockHandler.scheduleBlockUpdate(block.getRelative(BlockFace.SOUTH), Material.TRIPWIRE);
+        GeneralBlockHandler.scheduleBlockUpdate(block.getRelative(BlockFace.WEST), Material.TRIPWIRE);
     }
 
-    public static void scheduleTripwireUpdate(Block block) {
-        if (block.getType() != Material.TRIPWIRE) {
+    public static void stopRedstoneChange(Block block) {
+        GeneralBlockHandler.scheduleBlockUpdate(block.getRelative(BlockFace.NORTH), Material.REDSTONE_WIRE);
+        GeneralBlockHandler.scheduleBlockUpdate(block.getRelative(BlockFace.EAST), Material.REDSTONE_WIRE);
+        GeneralBlockHandler.scheduleBlockUpdate(block.getRelative(BlockFace.SOUTH), Material.REDSTONE_WIRE);
+        GeneralBlockHandler.scheduleBlockUpdate(block.getRelative(BlockFace.WEST), Material.REDSTONE_WIRE);
+        GeneralBlockHandler.scheduleBlockUpdate(block.getRelative(BlockFace.DOWN), Material.REDSTONE_WIRE);
+    }
+
+    public static void redstoneUpdateCheck(Block block) {
+        updateNeighbourRedstone(block);
+        updateNeighbourRedstone(block.getRelative(BlockFace.DOWN));
+        updateNeighbourRedstone(block.getRelative(BlockFace.UP));
+
+        updatedRedstone.clear();
+    }
+
+    private static void updateNeighbourRedstone(Block block) {
+        updateRedstone(block.getRelative(BlockFace.NORTH));
+        updateRedstone(block.getRelative(BlockFace.EAST));
+        updateRedstone(block.getRelative(BlockFace.SOUTH));
+        updateRedstone(block.getRelative(BlockFace.WEST));
+        updateRedstone(block.getRelative(BlockFace.DOWN));
+    }
+
+    private static void updateRedstone(Block redstone) {
+        if (redstone.getType() != Material.REDSTONE_WIRE) {
             return;
         }
 
-        BlockData data = block.getBlockData().clone();
-        Bukkit.getScheduler().runTaskLater(BlockEnforcer.getPlugin(), () -> block.setBlockData(data, false), 1L);
+        if (updatedRedstone.contains(redstone)) {
+            return;
+        }
+
+        redstone.getState().update(true, false);
+        updatedRedstone.add(redstone);
+        updateNeighbourRedstone(redstone);
     }
 
     public static void forceHookNBTState(ItemStack item, Block block) {
@@ -109,6 +174,14 @@ public class RedstoneBlockHandler {
 
         placedBlock.getState().update(true, false);
         event.setCancelled(true);
+    }
+
+    public static void setPowered(Block block, boolean poweredState) {
+        if (block.getBlockData() instanceof Powerable) {
+            Powerable powerable = (Powerable) block.getBlockData();
+            powerable.setPowered(poweredState);
+            block.setBlockData(powerable);
+        }
     }
 
     private static void setRailShape(Block block, Rail.Shape shape) {

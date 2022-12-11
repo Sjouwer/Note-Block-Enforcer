@@ -34,6 +34,7 @@ public class BlockUtil {
         materialBiMap.put(Material.MELON_STEM, Material.MELON_SEEDS);
         materialBiMap.put(Material.CARROTS, Material.CARROT);
         materialBiMap.put(Material.POTATOES, Material.POTATO);
+        materialBiMap.put(Material.REDSTONE_WIRE, Material.REDSTONE);
     }
 
     private BlockUtil() {

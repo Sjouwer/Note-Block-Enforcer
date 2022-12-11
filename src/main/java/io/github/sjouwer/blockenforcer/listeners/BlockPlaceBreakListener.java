@@ -1,15 +1,18 @@
 package io.github.sjouwer.blockenforcer.listeners;
 
+import io.github.sjouwer.blockenforcer.Config;
 import io.github.sjouwer.blockenforcer.handlers.NoteBlockHandler;
 import io.github.sjouwer.blockenforcer.handlers.RedstoneBlockHandler;
 import io.github.sjouwer.blockenforcer.handlers.TechnicalBlockHandler;
 import io.github.sjouwer.blockenforcer.handlers.BiomeHandler;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.inventory.meta.ItemMeta;
 
-public class BlockPlaceListener implements Listener {
+public class BlockPlaceBreakListener implements Listener {
+
     @EventHandler
     public void onBlockPlaceEvent(BlockPlaceEvent event) {
         switch (event.getBlockPlaced().getType()) {
@@ -19,6 +22,11 @@ public class BlockPlaceListener implements Listener {
 
             case TRIPWIRE_HOOK:
                 RedstoneBlockHandler.forceHookNBTState(event.getItemInHand(), event.getBlockPlaced());
+                break;
+
+            case REDSTONE_WIRE:
+                RedstoneBlockHandler.forceRedstoneNBTState(event.getItemInHand(), event.getBlockPlaced());
+                break;
 
             case FLOWER_POT:
                 TechnicalBlockHandler.placePottedPlant(event.getItemInHand(), event.getBlockPlaced());
@@ -39,6 +47,17 @@ public class BlockPlaceListener implements Listener {
         ItemMeta meta = event.getItemInHand().getItemMeta();
         if (meta != null && meta.hasLore()) {
             BiomeHandler.changeBiome(event.getBlockPlaced(), meta, event.getPlayer());
+        }
+
+        if (Config.STOP_REDSTONE_UPDATES) {
+            RedstoneBlockHandler.redstoneUpdateCheck(event.getBlockPlaced());
+        }
+    }
+
+    @EventHandler
+    public void onBlockBreakEvent(BlockBreakEvent event) {
+        if (Config.STOP_REDSTONE_UPDATES) {
+            RedstoneBlockHandler.redstoneUpdateCheck(event.getBlock());
         }
     }
 }

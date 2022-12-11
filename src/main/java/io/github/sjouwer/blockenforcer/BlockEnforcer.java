@@ -21,6 +21,7 @@ public class BlockEnforcer extends JavaPlugin {
         config.addDefault("BlockState-Picker-Tool", "bone");
         config.addDefault("Stop-NoteBlock-Updates", true);
         config.addDefault("Stop-Tripwire-Updates", true);
+        config.addDefault("Stop-Redstone-Updates", true);
         config.addDefault("Stop-Door-Updates", true);
         config.addDefault("Stop-Turtle-Egg-Updates", true);
         config.addDefault("Fix_WE_Wand_Desync", true);
@@ -32,7 +33,7 @@ public class BlockEnforcer extends JavaPlugin {
         saveConfig();
 
         Bukkit.getPluginManager().registerEvents(new BlockPhysicsListener(), BlockEnforcer.plugin);
-        Bukkit.getPluginManager().registerEvents(new BlockPlaceListener(), BlockEnforcer.plugin);
+        Bukkit.getPluginManager().registerEvents(new BlockPlaceBreakListener(), BlockEnforcer.plugin);
         Bukkit.getPluginManager().registerEvents(new PlayerInteractListener(), BlockEnforcer.plugin);
     }
 

@@ -1,6 +1,6 @@
 package io.github.sjouwer.blockenforcer.tools;
 
-import io.github.sjouwer.blockenforcer.BlockEnforcer;
+import io.github.sjouwer.blockenforcer.Config;
 import io.github.sjouwer.blockenforcer.utils.BlockUtil;
 import io.github.sjouwer.blockenforcer.utils.FlowerPotUtil;
 import io.github.sjouwer.blockenforcer.utils.ItemUtil;
@@ -19,23 +19,8 @@ import org.bukkit.inventory.ItemStack;
 import net.minecraft.server.v1_14_R1.NBTTagCompound;
 
 public class BlockStatePicker {
-    private static Material tool = Material.BONE;
-
-    static  {
-        String configTool = BlockEnforcer.getPlugin().getConfig().getString("BlockState-Picker-Tool");
-        if (configTool != null) {
-            Material material = Material.getMaterial(configTool.toUpperCase());
-            if (material != null) {
-                BlockStatePicker.tool = material;
-            }
-        }
-    }
 
     private BlockStatePicker() {
-    }
-
-    public static Material getTool() {
-        return tool;
     }
 
     public static void provideBlockInfo(Block clickedBlock, Player player) {
@@ -89,7 +74,7 @@ public class BlockStatePicker {
         Inventory inventory = player.getInventory();
         int slot = inventory.firstEmpty();
         if (slot < 0 || slot > 8) {
-            slot = inventory.first(tool) + 1;
+            slot = inventory.first(Config.getPickerTool()) + 1;
             if (slot > 8) {
                 slot = 0;
             }
