@@ -6,15 +6,18 @@ import net.minecraft.server.v1_14_R1.NBTTagCompound;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
+import org.bukkit.block.data.AnaloguePowerable;
 import org.bukkit.block.data.Bisected;
 import org.bukkit.block.data.Powerable;
 import org.bukkit.block.data.Rail;
+import org.bukkit.block.data.type.Cake;
 import org.bukkit.block.data.type.Door;
 import org.bukkit.block.data.type.RedstoneWire;
 import org.bukkit.block.data.type.TripwireHook;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.material.PressureSensor;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -153,6 +156,42 @@ public class RedstoneBlockHandler {
         relatedDoor.setOpen(door.isOpen());
         relatedBlock.setBlockData(relatedDoor);
         relatedBlock.getState().update(true, false);
+    }
+
+    public static void forcePlacePressurePlate(PlayerInteractEvent event) {
+        Block placedBlock = BlockPlaceHandler.placeBlock(event);
+        if (placedBlock == null) {
+            return;
+        }
+
+        NBTTagCompound blockStateTag = BlockUtil.getBlockStateTag(event.getItem());
+        if (blockStateTag != null) {
+            String powered = blockStateTag.getString("powered");
+            if (!powered.isEmpty()) setPowered(placedBlock, Boolean.parseBoolean(powered));
+        }
+
+        placedBlock.getState().update(true);
+        event.setCancelled(true);
+    }
+
+    public static void forcePlaceWeightedPressurePlate(PlayerInteractEvent event) {
+        Block placedBlock = BlockPlaceHandler.placeBlock(event);
+        if (placedBlock == null) {
+            return;
+        }
+
+        NBTTagCompound blockStateTag = BlockUtil.getBlockStateTag(event.getItem());
+        if (blockStateTag != null) {
+            AnaloguePowerable plate = (AnaloguePowerable) placedBlock.getBlockData();
+
+            String power = blockStateTag.getString("power");
+            if (!power.isEmpty()) plate.setPower(Integer.parseInt(power));
+
+            placedBlock.setBlockData(plate);
+            placedBlock.getState().update(true);
+        }
+
+        event.setCancelled(true);
     }
 
     public static void forcePlaceRail(PlayerInteractEvent event) {

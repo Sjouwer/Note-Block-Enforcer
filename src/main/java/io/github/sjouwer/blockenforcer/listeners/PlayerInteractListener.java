@@ -138,6 +138,21 @@ public class PlayerInteractListener implements Listener {
                     GeneralBlockHandler.forcePlaceSeaPickle(event);
                     break;
 
+                case ACACIA_PRESSURE_PLATE:
+                case BIRCH_PRESSURE_PLATE:
+                case DARK_OAK_PRESSURE_PLATE:
+                case JUNGLE_PRESSURE_PLATE:
+                case OAK_PRESSURE_PLATE:
+                case SPRUCE_PRESSURE_PLATE:
+                case STONE_PRESSURE_PLATE:
+                    RedstoneBlockHandler.forcePlacePressurePlate(event);
+                    break;
+
+                case HEAVY_WEIGHTED_PRESSURE_PLATE:
+                case LIGHT_WEIGHTED_PRESSURE_PLATE:
+                    RedstoneBlockHandler.forcePlaceWeightedPressurePlate(event);
+                    break;
+
                 default:
             }
         }
