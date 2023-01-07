@@ -17,7 +17,7 @@ import org.bukkit.inventory.EquipmentSlot;
 
 public class PlayerInteractListener implements Listener {
 
-    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void onPlayerInteractEvent(PlayerInteractEvent event) {
         if (event.getClickedBlock() == null) {
             return;
@@ -30,16 +30,13 @@ public class PlayerInteractListener implements Listener {
             return;
         }
 
-        noteBlockClickCheck(event);
+        boolean noteBlockClicked = noteBlockClickCheck(event);
+        statePickerCheck(event);
         doorUpdateCheck(event);
 
-        if (event.getItem() == null) {
-            return;
-        }
-
-        statePickerCheck(event);
-
-        if (isInteractable(event.getClickedBlock()) && !event.getPlayer().isSneaking()) {
+        if (event.getItem() == null ||
+                (event.isCancelled() && !noteBlockClicked) ||
+                (isInteractable(event.getClickedBlock()) && !event.getPlayer().isSneaking())) {
             return;
         }
 
@@ -58,6 +55,7 @@ public class PlayerInteractListener implements Listener {
 
     private void doorUpdateCheck(PlayerInteractEvent event) {
         if (Config.STOP_DOOR_UPDATES &&
+                !event.isCancelled() &&
                 event.getAction() == Action.RIGHT_CLICK_BLOCK &&
                 event.getClickedBlock().getBlockData() instanceof Door &&
                 event.getHand() == EquipmentSlot.HAND &&
@@ -86,7 +84,7 @@ public class PlayerInteractListener implements Listener {
         }
     }
 
-    private void noteBlockClickCheck(PlayerInteractEvent event) {
+    private boolean noteBlockClickCheck(PlayerInteractEvent event) {
         if (Config.OVERRIDE_NOTE_BLOCK_CLICK &&
                 event.getClickedBlock().getType() == Material.NOTE_BLOCK &&
                 event.getAction() == Action.RIGHT_CLICK_BLOCK &&
@@ -96,11 +94,15 @@ public class PlayerInteractListener implements Listener {
             if (event.getItem() != null) {
                 BlockPlaceHandler.forcePlayerToPlaceBlock(event.getPlayer(), event.getItem(), event.getClickedBlock().getRelative(event.getBlockFace()), event.getHand());
             }
+            return true;
         }
+
+        return false;
     }
 
     private void statePickerCheck(PlayerInteractEvent event) {
         if (Config.ENABLE_BLOCKSTATE_PICKER &&
+                event.getItem() != null &&
                 event.getItem().getType() == Config.getPickerTool() &&
                 event.getHand() == EquipmentSlot.HAND) {
             event.setCancelled(true);
