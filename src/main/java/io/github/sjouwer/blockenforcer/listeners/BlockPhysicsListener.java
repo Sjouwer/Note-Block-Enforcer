@@ -12,7 +12,6 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.block.BlockFormEvent;
 import org.bukkit.event.block.BlockPhysicsEvent;
 import org.bukkit.event.entity.EntitySpawnEvent;
 
@@ -50,16 +49,18 @@ public class BlockPhysicsListener implements Listener {
             if (block.getType() == Material.TRIPWIRE) {
                 cancel = true;
             }
-
-            RedstoneBlockHandler.stopTripwireChange(block);
+            else if(event.getSourceBlock() == block) {
+                RedstoneBlockHandler.stopTripwireChange(block);
+            }
         }
 
         if (Config.STOP_REDSTONE_UPDATES) {
             if (block.getType() == Material.REDSTONE_WIRE) {
                 cancel = true;
             }
-
-            RedstoneBlockHandler.stopRedstoneChange(block);
+            else if(event.getSourceBlock() == block) {
+                RedstoneBlockHandler.stopRedstoneChange(block);
+            }
         }
 
         if (cancel) {

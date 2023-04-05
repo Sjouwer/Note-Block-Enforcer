@@ -1,38 +1,14 @@
 package io.github.sjouwer.blockenforcer.handlers;
 
-import io.github.sjouwer.blockenforcer.BlockEnforcer;
 import io.github.sjouwer.blockenforcer.utils.BlockUtil;
 import net.minecraft.server.v1_14_R1.NBTTagCompound;
-import org.bukkit.Bukkit;
-import org.bukkit.Material;
 import org.bukkit.block.Block;
-import org.bukkit.block.data.BlockData;
 import org.bukkit.block.data.type.Cake;
 import org.bukkit.block.data.type.SeaPickle;
 import org.bukkit.event.player.PlayerInteractEvent;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class GeneralBlockHandler {
-    private static final List<Block> scheduledBlocks = new ArrayList<>();
-
     private GeneralBlockHandler() {
-    }
-
-    public static void scheduleBlockUpdate(Block block, Material material) {
-        if (block.getType() != material || scheduledBlocks.contains(block)) {
-            return;
-        }
-
-        scheduledBlocks.add(block);
-        BlockData data = block.getBlockData().clone();
-        Bukkit.getScheduler().runTaskLater(BlockEnforcer.getPlugin(), () -> {
-            if (block.getType() == data.getMaterial()) {
-                block.setBlockData(data, false);
-                scheduledBlocks.remove(block);
-            }
-        }, 1L);
     }
 
     public static void forcePlaceBlock(PlayerInteractEvent event) {
@@ -58,7 +34,7 @@ public class GeneralBlockHandler {
             if (!bites.isEmpty()) cake.setBites(Integer.parseInt(bites));
 
             placedBlock.setBlockData(cake);
-            placedBlock.getState().update(true);
+            placedBlock.getState().update(true, false);
         }
 
         event.setCancelled(true);
@@ -81,7 +57,7 @@ public class GeneralBlockHandler {
             if (!waterlogged.isEmpty()) pickle.setWaterlogged(Boolean.parseBoolean(waterlogged));
 
             placedBlock.setBlockData(pickle);
-            placedBlock.getState().update(true);
+            placedBlock.getState().update(true, false);
         }
 
         event.setCancelled(true);

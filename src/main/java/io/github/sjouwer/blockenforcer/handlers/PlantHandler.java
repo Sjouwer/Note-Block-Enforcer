@@ -47,7 +47,7 @@ public class PlantHandler {
             Bisected halfPlant = (Bisected) block.getBlockData();
             halfPlant.setHalf(half);
             block.setBlockData(halfPlant);
-            block.getState().update(true);
+            block.getState().update(true, false);
         }
     }
 
@@ -88,7 +88,7 @@ public class PlantHandler {
             Ageable plant = (Ageable) block.getBlockData();
             plant.setAge(age);
             block.setBlockData(plant);
-            block.getState().update(true);
+            block.getState().update(true, false);
         }
     }
 
@@ -106,7 +106,7 @@ public class PlantHandler {
             if (!stage.isEmpty()) sapling.setStage(Integer.parseInt(stage));
 
             placedBlock.setBlockData(sapling);
-            placedBlock.getState().update(true);
+            placedBlock.getState().update(true, false);
         }
 
         event.setCancelled(true);
@@ -132,7 +132,7 @@ public class PlantHandler {
             if (!leaves.isEmpty()) bamboo.setLeaves(stringToLeaves(leaves));
 
             placedBlock.setBlockData(bamboo);
-            placedBlock.getState().update(true);
+            placedBlock.getState().update(true, false);
         }
 
         event.setCancelled(true);

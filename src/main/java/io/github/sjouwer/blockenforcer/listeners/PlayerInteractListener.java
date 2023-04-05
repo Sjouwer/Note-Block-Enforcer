@@ -15,6 +15,7 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
 
+@SuppressWarnings("deprecation")
 public class PlayerInteractListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST)
@@ -236,8 +237,15 @@ public class PlayerInteractListener implements Listener {
                 event.getClickedBlock() != null &&
                 event.getItem() != null &&
                 event.getItem().getType() == Config.getWEWand()) {
-            Block blockAbove = event.getClickedBlock().getRelative(BlockFace.UP, 1);
+
+            Block block = event.getClickedBlock();
+            Block blockAbove = block.getRelative(BlockFace.UP, 1);
+
             NoteBlockHandler.updateAllAboveNoteBlocks(blockAbove);
+
+            if (block.getType() == Material.REDSTONE_WIRE) {
+                RedstoneBlockHandler.updateRedstone(event.getClickedBlock(), true);
+            }
         }
     }
 }

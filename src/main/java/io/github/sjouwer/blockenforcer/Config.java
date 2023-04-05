@@ -6,6 +6,7 @@ public class Config {
     public static final boolean STOP_NOTE_BLOCK_UPDATES = BlockEnforcer.getPlugin().getConfig().getBoolean("Stop-NoteBlock-Updates");
     public static final boolean STOP_TRIPWIRE_UPDATES = BlockEnforcer.getPlugin().getConfig().getBoolean("Stop-Tripwire-Updates");
     public static final boolean STOP_REDSTONE_UPDATES = BlockEnforcer.getPlugin().getConfig().getBoolean("Stop-Redstone-Updates");
+    public static final int MAX_REDSTONE_UPDATES = BlockEnforcer.getPlugin().getConfig().getInt("Max-Redstone-Updates-Per-Tick");
     public static final boolean STOP_DOOR_UPDATES = BlockEnforcer.getPlugin().getConfig().getBoolean("Stop-Door-Updates");
     public static final boolean DISABLE_CHORUS_PLACEMENT_RULES = BlockEnforcer.getPlugin().getConfig().getBoolean("Disable-Plant-Placement-Rules");
     public static final boolean STOP_FALLING_BLOCKS = BlockEnforcer.getPlugin().getConfig().getBoolean("Stop-Falling-Blocks");
