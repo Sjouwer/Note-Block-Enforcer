@@ -141,6 +141,10 @@ public class PlayerInteractListener implements Listener {
                     GeneralBlockHandler.forcePlaceSeaPickle(event);
                     break;
 
+                case SNOW:
+                    GeneralBlockHandler.forcePlaceSnow(event);
+                    break;
+
                 case ACACIA_PRESSURE_PLATE:
                 case BIRCH_PRESSURE_PLATE:
                 case DARK_OAK_PRESSURE_PLATE:
