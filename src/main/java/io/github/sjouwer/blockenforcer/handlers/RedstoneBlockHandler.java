@@ -259,10 +259,10 @@ public class RedstoneBlockHandler {
             if (!power.isEmpty()) plate.setPower(Integer.parseInt(power));
 
             placedBlock.setBlockData(plate);
-            stopRedstoneChange(placedBlock);
-            placedBlock.getState().update(true, false);
         }
 
+        stopRedstoneChange(placedBlock);
+        placedBlock.getState().update(true, false);
         event.setCancelled(true);
     }
 

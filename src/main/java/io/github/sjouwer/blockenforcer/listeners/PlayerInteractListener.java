@@ -232,20 +232,21 @@ public class PlayerInteractListener implements Listener {
     
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onWEWandDesync(PlayerInteractEvent event) {
-        if (Config.FIX_WE_WAND_DESYNC &&
+        if (
                 event.getAction() == Action.LEFT_CLICK_BLOCK &&
                 event.getClickedBlock() != null &&
                 event.getItem() != null &&
-                event.getItem().getType() == Config.getWEWand()) {
-
+                (
+                        (Config.FIX_WE_WAND_DESYNC && event.getItem().getType() == Config.getWEWand()) ||
+                        (Config.ENABLE_BLOCKSTATE_PICKER && event.getItem().getType() == Config.getPickerTool())
+                )
+            )
+        {
             Block block = event.getClickedBlock();
             Block blockAbove = block.getRelative(BlockFace.UP, 1);
 
             NoteBlockHandler.updateAllAboveNoteBlocks(blockAbove);
-
-            if (block.getType() == Material.REDSTONE_WIRE) {
-                RedstoneBlockHandler.updateRedstone(event.getClickedBlock(), true);
-            }
+            RedstoneBlockHandler.updateRedstone(event.getClickedBlock(), true);
         }
     }
 }
