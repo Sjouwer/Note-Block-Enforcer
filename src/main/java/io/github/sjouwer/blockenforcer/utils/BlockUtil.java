@@ -32,9 +32,11 @@ public class BlockUtil {
         materialBiMap.put(Material.BEETROOTS, Material.BEETROOT_SEEDS);
         materialBiMap.put(Material.PUMPKIN_STEM, Material.PUMPKIN_SEEDS);
         materialBiMap.put(Material.MELON_STEM, Material.MELON_SEEDS);
+        materialBiMap.put(Material.COCOA, Material.COCOA_BEANS);
         materialBiMap.put(Material.CARROTS, Material.CARROT);
         materialBiMap.put(Material.POTATOES, Material.POTATO);
         materialBiMap.put(Material.REDSTONE_WIRE, Material.REDSTONE);
+        materialBiMap.put(Material.TRIPWIRE, Material.STRING);
     }
 
     private BlockUtil() {
