@@ -12,7 +12,7 @@ import org.bukkit.event.block.BlockBreakEvent;
 
 public class BlockBreakListener implements Listener {
 
-    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onBlockBreakEvent(BlockBreakEvent event) {
         Block block = event.getBlock();
 

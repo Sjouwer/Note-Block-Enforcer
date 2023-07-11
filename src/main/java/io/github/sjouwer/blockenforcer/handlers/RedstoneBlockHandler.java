@@ -98,7 +98,7 @@ public class RedstoneBlockHandler {
             return;
         }
 
-        stopRedstoneChangeByRedstone(placedBlock);
+        stopRedstoneChange(placedBlock);
 
         placedBlock.getState().update(true, false);
         event.setCancelled(true);
@@ -136,10 +136,6 @@ public class RedstoneBlockHandler {
         clearUpdatedBlocks();
         stopRedstoneChangeAround(block);
         scheduleBlockChangeUpdate(block.getRelative(BlockFace.DOWN), Material.REDSTONE_WIRE);
-    }
-
-    public static void stopRedstoneChangeByRedstone(Block block) {
-        stopRedstoneChange(block);
         stopRedstoneChangeAround(block.getRelative(BlockFace.DOWN));
         scheduleBlockChangeUpdate(block.getRelative(BlockFace.UP), Material.REDSTONE_WIRE);
         stopRedstoneChangeAround(block.getRelative(BlockFace.UP));

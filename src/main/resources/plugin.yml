@@ -1,5 +1,5 @@
 name: BlockEnforcer
-version: 1.0.13
+version: 1.0.15
 main: "io.github.sjouwer.blockenforcer.BlockEnforcer"
 
 author: Sjouwer

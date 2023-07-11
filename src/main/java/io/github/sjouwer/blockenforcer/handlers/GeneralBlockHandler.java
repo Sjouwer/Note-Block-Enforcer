@@ -106,7 +106,7 @@ public class GeneralBlockHandler {
         event.setCancelled(true);
     }
 
-    public static boolean addSnowLayer(Block placementBlock, PlayerInteractEvent event) {
+    private static boolean addSnowLayer(Block placementBlock, PlayerInteractEvent event) {
         Snow snow = (Snow) placementBlock.getBlockData();
         if (snow.getLayers() != 8) {
             BlockState replacedBlockState = placementBlock.getState();
