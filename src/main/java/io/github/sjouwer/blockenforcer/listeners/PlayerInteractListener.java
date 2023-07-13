@@ -160,6 +160,14 @@ public class PlayerInteractListener implements Listener {
                     RedstoneBlockHandler.forcePlaceWeightedPressurePlate(event);
                     break;
 
+                case REPEATER:
+                    RedstoneBlockHandler.forcePlaceRepeater(event);
+                    break;
+
+                case COMPARATOR:
+                    RedstoneBlockHandler.forcePlaceComparator(event);
+                    break;
+
                 default:
             }
         }

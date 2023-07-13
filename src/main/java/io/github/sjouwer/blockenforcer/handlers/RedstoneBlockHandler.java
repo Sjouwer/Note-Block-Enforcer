@@ -9,10 +9,7 @@ import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.*;
-import org.bukkit.block.data.type.Door;
-import org.bukkit.block.data.type.Gate;
-import org.bukkit.block.data.type.RedstoneWire;
-import org.bukkit.block.data.type.TripwireHook;
+import org.bukkit.block.data.type.*;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 
@@ -266,6 +263,65 @@ public class RedstoneBlockHandler {
 
             placedBlock.setBlockData(plate);
         }
+
+        stopRedstoneChange(placedBlock);
+        placedBlock.getState().update(true, false);
+        event.setCancelled(true);
+    }
+
+    public static void forcePlaceRepeater(PlayerInteractEvent event) {
+        Block placedBlock = BlockPlaceHandler.placeBlock(event);
+        if (placedBlock == null) {
+            return;
+        }
+
+        Repeater repeater = (Repeater) placedBlock.getBlockData();
+        NBTTagCompound blockStateTag = BlockUtil.getBlockStateTag(event.getItem());
+        if (blockStateTag != null) {
+            String powered = blockStateTag.getString("powered");
+            if (!powered.isEmpty()) repeater.setPowered(Boolean.parseBoolean(powered));
+
+            String locked = blockStateTag.getString("locked");
+            if (!locked.isEmpty()) repeater.setLocked(Boolean.parseBoolean(locked));
+
+            String delay = blockStateTag.getString("delay");
+            if (!delay.isEmpty()) repeater.setDelay(Integer.parseInt(delay));
+        }
+
+        BlockFace facing = event.getBlockFace();
+        if (facing == BlockFace.UP || facing == BlockFace.DOWN) {
+            facing = event.getPlayer().getFacing().getOppositeFace();
+        }
+        repeater.setFacing(facing);
+        placedBlock.setBlockData(repeater);
+
+        stopRedstoneChange(placedBlock);
+        placedBlock.getState().update(true, false);
+        event.setCancelled(true);
+    }
+
+    public static void forcePlaceComparator(PlayerInteractEvent event) {
+        Block placedBlock = BlockPlaceHandler.placeBlock(event);
+        if (placedBlock == null) {
+            return;
+        }
+
+        Comparator comparator = (Comparator) placedBlock.getBlockData();
+        NBTTagCompound blockStateTag = BlockUtil.getBlockStateTag(event.getItem());
+        if (blockStateTag != null) {
+            String powered = blockStateTag.getString("powered");
+            if (!powered.isEmpty()) comparator.setPowered(Boolean.parseBoolean(powered));
+
+            String mode = blockStateTag.getString("mode").toUpperCase();
+            if (!mode.isEmpty()) comparator.setMode(Comparator.Mode.valueOf(mode));
+        }
+
+        BlockFace facing = event.getBlockFace();
+        if (facing == BlockFace.UP || facing == BlockFace.DOWN) {
+            facing = event.getPlayer().getFacing().getOppositeFace();
+        }
+        comparator.setFacing(facing);
+        placedBlock.setBlockData(comparator);
 
         stopRedstoneChange(placedBlock);
         placedBlock.getState().update(true, false);

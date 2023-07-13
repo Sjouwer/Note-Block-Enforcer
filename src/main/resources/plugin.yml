@@ -1,11 +1,11 @@
 name: BlockEnforcer
-version: 1.0.15
+version: 1.0.17
 main: "io.github.sjouwer.blockenforcer.BlockEnforcer"
 
 author: Sjouwer
 
 api-version: 1.14
 
-depends: []
-soft-depend: []
+depend: []
+softdepend: [BiomeCycler]
 loadbefore: []
