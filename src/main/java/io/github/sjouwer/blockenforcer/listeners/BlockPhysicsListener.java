@@ -7,6 +7,8 @@ import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.type.Door;
+import org.bukkit.block.data.type.Fence;
+import org.bukkit.block.data.type.Gate;
 import org.bukkit.block.data.type.TrapDoor;
 import org.bukkit.entity.EntityType;
 import org.bukkit.event.EventHandler;
@@ -41,8 +43,13 @@ public class BlockPhysicsListener implements Listener {
 
         if (Config.STOP_DOOR_UPDATES &&
                 block.getBlockData() instanceof Door ||
-                block.getBlockData() instanceof TrapDoor) {
+                block.getBlockData() instanceof TrapDoor ||
+                block.getBlockData() instanceof Gate) {
             cancel = true;
+        }
+
+        if (Config.STOP_DOOR_UPDATES && block.getBlockData() instanceof Fence) {
+            RedstoneBlockHandler.stopGateChange(block);
         }
 
         if (Config.STOP_TRIPWIRE_UPDATES) {

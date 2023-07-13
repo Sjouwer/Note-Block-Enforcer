@@ -1,9 +1,12 @@
 package io.github.sjouwer.blockenforcer.listeners;
 
+import io.github.sjouwer.blockenforcer.Config;
 import io.github.sjouwer.blockenforcer.handlers.NoteBlockHandler;
 import io.github.sjouwer.blockenforcer.handlers.RedstoneBlockHandler;
 import io.github.sjouwer.blockenforcer.handlers.TechnicalBlockHandler;
 import io.github.sjouwer.blockenforcer.handlers.BiomeHandler;
+import org.bukkit.block.Block;
+import org.bukkit.block.data.type.Fence;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockPlaceEvent;
@@ -13,30 +16,32 @@ public class BlockPlaceListener implements Listener {
 
     @EventHandler
     public void onBlockPlaceEvent(BlockPlaceEvent event) {
-        switch (event.getBlockPlaced().getType()) {
+        Block placedBlock = event.getBlockPlaced();
+
+        switch (placedBlock.getType()) {
             case NOTE_BLOCK:
-                NoteBlockHandler.forceNoteBlockNBTState(event.getItemInHand(), event.getBlockPlaced());
+                NoteBlockHandler.forceNoteBlockNBTState(event.getItemInHand(), placedBlock);
                 break;
 
             case TRIPWIRE_HOOK:
-                RedstoneBlockHandler.forceHookNBTState(event.getItemInHand(), event.getBlockPlaced());
+                RedstoneBlockHandler.forceHookNBTState(event.getItemInHand(), placedBlock);
                 break;
 
             case REDSTONE_WIRE:
-                RedstoneBlockHandler.forceRedstoneNBTState(event.getItemInHand(), event.getBlockPlaced());
+                RedstoneBlockHandler.forceRedstoneNBTState(event.getItemInHand(), placedBlock);
                 break;
 
             case FLOWER_POT:
-                TechnicalBlockHandler.placePottedPlant(event.getItemInHand(), event.getBlockPlaced());
+                TechnicalBlockHandler.placePottedPlant(event.getItemInHand(), placedBlock);
                 break;
 
             case ICE:
-                TechnicalBlockHandler.placeFrostedIce(event.getItemInHand(), event.getBlockPlaced());
+                TechnicalBlockHandler.placeFrostedIce(event.getItemInHand(), placedBlock);
                 break;
 
             case PISTON:
             case STICKY_PISTON:
-                TechnicalBlockHandler.placePistonHead(event.getItemInHand(), event.getBlockPlaced());
+                TechnicalBlockHandler.placePistonHead(event.getItemInHand(), placedBlock);
                 break;
 
             default:

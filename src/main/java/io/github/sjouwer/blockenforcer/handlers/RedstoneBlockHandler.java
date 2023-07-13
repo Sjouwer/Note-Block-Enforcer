@@ -10,6 +10,7 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.*;
 import org.bukkit.block.data.type.Door;
+import org.bukkit.block.data.type.Gate;
 import org.bukkit.block.data.type.RedstoneWire;
 import org.bukkit.block.data.type.TripwireHook;
 import org.bukkit.event.player.PlayerInteractEvent;
@@ -22,19 +23,15 @@ import java.util.Map;
 
 public class RedstoneBlockHandler {
     private static final Map<Block, BlockData> BlocksToChange = new HashMap<>();
-    private static final List<Block> updatedBlocks = new ArrayList<>();
-    private static final List<Block> blocksToUpdate = new ArrayList<>();
+    private static final List<Block> updatedRedstone = new ArrayList<>();
+    private static final List<Block> redstoneToUpdate = new ArrayList<>();
     private static int currentUpdateCount = 0;
 
     private RedstoneBlockHandler() {
     }
 
-    public static void clearUpdatedBlocks() {
-        updatedBlocks.clear();
-    }
-
     private static void scheduleBlockChangeUpdate(Block blockToChange, Material material) {
-        if (blockToChange.getType() != material || updatedBlocks.contains(blockToChange) || BlocksToChange.containsKey(blockToChange)) {
+        if ((material != null && blockToChange.getType() != material) || BlocksToChange.containsKey(blockToChange)) {
             return;
         }
 
@@ -47,8 +44,10 @@ public class RedstoneBlockHandler {
                     if (block.getType() == data.getMaterial()) {
                         block.setBlockData(data, false);
                         block.getState().update(true, false);
-                        updatedBlocks.add(block);
-                        updateRedstone(block);
+                        if (material == Material.REDSTONE_WIRE) {
+                            updatedRedstone.add(block);
+                            updateRedstone(block);
+                        }
                     }
                 });
 
@@ -58,17 +57,17 @@ public class RedstoneBlockHandler {
     }
 
     private static void scheduleRedstoneUpdate(Block blockToUpdate) {
-        if (blockToUpdate.getType() != Material.REDSTONE_WIRE || updatedBlocks.contains(blockToUpdate) || blocksToUpdate.contains(blockToUpdate)) {
+        if (blockToUpdate.getType() != Material.REDSTONE_WIRE || updatedRedstone.contains(blockToUpdate) || redstoneToUpdate.contains(blockToUpdate)) {
             return;
         }
 
-        blocksToUpdate.add(blockToUpdate);
+        redstoneToUpdate.add(blockToUpdate);
 
-        if (blocksToUpdate.size() == 1) {
+        if (redstoneToUpdate.size() == 1) {
             Bukkit.getScheduler().runTaskLater(BlockEnforcer.getPlugin(), () -> {
                 currentUpdateCount = 0;
-                List<Block> blocks = new ArrayList<>(blocksToUpdate);
-                blocksToUpdate.clear();
+                List<Block> blocks = new ArrayList<>(redstoneToUpdate);
+                redstoneToUpdate.clear();
                 for (Block block : blocks) {
                     updateRedstoneNow(block);
                 }
@@ -77,17 +76,18 @@ public class RedstoneBlockHandler {
     }
 
     private static void updateRedstoneNow(Block block) {
-        if (block.getType() != Material.REDSTONE_WIRE || updatedBlocks.contains(block) || blocksToUpdate.contains(block)) {
+        if (block.getType() != Material.REDSTONE_WIRE || updatedRedstone.contains(block) || redstoneToUpdate.contains(block)) {
             return;
         }
 
         if (currentUpdateCount < Config.MAX_REDSTONE_UPDATES) {
             currentUpdateCount++;
             block.getState().update(true, false);
-            updatedBlocks.add(block);
+            updatedRedstone.add(block);
             updateRedstone(block);
         }
         else {
+            System.out.println("ping");
             scheduleRedstoneUpdate(block);
         }
     }
@@ -133,7 +133,7 @@ public class RedstoneBlockHandler {
     }
 
     public static void stopRedstoneChange(Block block) {
-        clearUpdatedBlocks();
+        updatedRedstone.clear();
         stopRedstoneChangeAround(block);
         scheduleBlockChangeUpdate(block.getRelative(BlockFace.DOWN), Material.REDSTONE_WIRE);
         stopRedstoneChangeAround(block.getRelative(BlockFace.DOWN));
@@ -150,7 +150,7 @@ public class RedstoneBlockHandler {
 
     public static void updateRedstone(Block block, boolean resetUpdates) {
         if (resetUpdates) {
-            clearUpdatedBlocks();
+            updatedRedstone.clear();
         }
         updateRedstone(block);
     }
@@ -194,11 +194,21 @@ public class RedstoneBlockHandler {
     }
 
     public static void stopTripwireChange(Block block) {
-        clearUpdatedBlocks();
         scheduleBlockChangeUpdate(block.getRelative(BlockFace.NORTH), Material.TRIPWIRE);
         scheduleBlockChangeUpdate(block.getRelative(BlockFace.EAST), Material.TRIPWIRE);
         scheduleBlockChangeUpdate(block.getRelative(BlockFace.SOUTH), Material.TRIPWIRE);
         scheduleBlockChangeUpdate(block.getRelative(BlockFace.WEST), Material.TRIPWIRE);
+    }
+
+    public static void stopGateChange(Block block) {
+        Block relativeBlock = block.getRelative(BlockFace.NORTH);
+        if (relativeBlock.getBlockData() instanceof Gate) scheduleBlockChangeUpdate(relativeBlock, null);
+        relativeBlock = block.getRelative(BlockFace.EAST);
+        if (relativeBlock.getBlockData() instanceof Gate) scheduleBlockChangeUpdate(relativeBlock, null);
+        relativeBlock = block.getRelative(BlockFace.SOUTH);
+        if (relativeBlock.getBlockData() instanceof Gate) scheduleBlockChangeUpdate(relativeBlock, null);
+        relativeBlock = block.getRelative(BlockFace.WEST);
+        if (relativeBlock.getBlockData() instanceof Gate) scheduleBlockChangeUpdate(relativeBlock, null);
     }
 
     public static void openDoorWithoutOtherChanges(Block block) {
