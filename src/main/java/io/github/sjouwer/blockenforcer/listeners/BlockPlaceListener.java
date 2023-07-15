@@ -1,12 +1,8 @@
 package io.github.sjouwer.blockenforcer.listeners;
 
-import io.github.sjouwer.blockenforcer.Config;
-import io.github.sjouwer.blockenforcer.handlers.NoteBlockHandler;
-import io.github.sjouwer.blockenforcer.handlers.RedstoneBlockHandler;
 import io.github.sjouwer.blockenforcer.handlers.TechnicalBlockHandler;
 import io.github.sjouwer.blockenforcer.handlers.BiomeHandler;
 import org.bukkit.block.Block;
-import org.bukkit.block.data.type.Fence;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockPlaceEvent;
@@ -19,18 +15,6 @@ public class BlockPlaceListener implements Listener {
         Block placedBlock = event.getBlockPlaced();
 
         switch (placedBlock.getType()) {
-            case NOTE_BLOCK:
-                NoteBlockHandler.forceNoteBlockNBTState(event.getItemInHand(), placedBlock);
-                break;
-
-            case TRIPWIRE_HOOK:
-                RedstoneBlockHandler.forceHookNBTState(event.getItemInHand(), placedBlock);
-                break;
-
-            case REDSTONE_WIRE:
-                RedstoneBlockHandler.forceRedstoneNBTState(event.getItemInHand(), placedBlock);
-                break;
-
             case FLOWER_POT:
                 TechnicalBlockHandler.placePottedPlant(event.getItemInHand(), placedBlock);
                 break;

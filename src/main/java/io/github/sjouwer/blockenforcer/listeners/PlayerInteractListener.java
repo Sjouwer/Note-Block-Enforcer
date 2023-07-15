@@ -3,10 +3,13 @@ package io.github.sjouwer.blockenforcer.listeners;
 import io.github.sjouwer.blockenforcer.Config;
 import io.github.sjouwer.blockenforcer.handlers.*;
 import io.github.sjouwer.blockenforcer.tools.BlockStatePicker;
+import io.github.sjouwer.blockenforcer.utils.BlockUtil;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Tag;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
+import org.bukkit.block.data.BlockData;
 import org.bukkit.block.data.type.Door;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -20,29 +23,21 @@ public class PlayerInteractListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onPlayerInteractEvent(PlayerInteractEvent event) {
-        if (event.getClickedBlock() == null) {
-            return;
-        }
+        if (event.getClickedBlock() == null) return;
 
         tripwireUpdateCheck(event);
         turtleEggBreakingCheck(event);
 
-        if (event.getHand() == null) {
-            return;
-        }
+        if (event.getHand() == null) return;
 
-        boolean noteBlockClicked = noteBlockClickCheck(event);
         statePickerCheck(event);
         doorUpdateCheck(event);
 
-        if (event.getItem() == null ||
-                (event.isCancelled() && !noteBlockClicked) ||
-                (isInteractable(event.getClickedBlock()) && !event.getPlayer().isSneaking())) {
-            return;
-        }
+        if (isInteractable(event.getClickedBlock()) && !event.getPlayer().isSneaking()) return;
 
         blockPlaceCheck(event);
         plantPlaceCheck(event);
+        noteBlockClickCheck(event);
     }
 
     private boolean isInteractable(Block block) {
@@ -85,20 +80,19 @@ public class PlayerInteractListener implements Listener {
         }
     }
 
-    private boolean noteBlockClickCheck(PlayerInteractEvent event) {
-        if (Config.OVERRIDE_NOTE_BLOCK_CLICK &&
-                event.getClickedBlock().getType() == Material.NOTE_BLOCK &&
-                event.getAction() == Action.RIGHT_CLICK_BLOCK &&
-                (event.getItem() == null || !event.getPlayer().isSneaking())) {
-
-            event.setCancelled(true);
-            if (event.getItem() != null) {
-                BlockPlaceHandler.forcePlayerToPlaceBlock(event.getPlayer(), event.getItem(), event.getClickedBlock().getRelative(event.getBlockFace()), event.getHand());
-            }
-            return true;
+    private void noteBlockClickCheck(PlayerInteractEvent event) {
+        if (event.isCancelled() ||
+                !Config.OVERRIDE_NOTE_BLOCK_CLICK ||
+                event.getClickedBlock().getType() != Material.NOTE_BLOCK ||
+                event.getAction() != Action.RIGHT_CLICK_BLOCK ||
+                (event.getItem() != null && event.getPlayer().isSneaking())) {
+            return;
         }
 
-        return false;
+        event.setCancelled(true);
+
+        if (event.getItem() == null) return;
+        BlockPlaceHandler.forcePlayerToPlaceBlock(event.getPlayer(), event.getItem(), event.getClickedBlock().getRelative(event.getBlockFace()), event.getHand());
     }
 
     private void statePickerCheck(PlayerInteractEvent event) {
@@ -120,125 +114,143 @@ public class PlayerInteractListener implements Listener {
     }
 
     private void blockPlaceCheck(PlayerInteractEvent event) {
-        if (event.getAction() == Action.RIGHT_CLICK_BLOCK) {
-            switch (event.getItem().getType()) {
-                case RAIL:
-                case ACTIVATOR_RAIL:
-                case DETECTOR_RAIL:
-                case POWERED_RAIL:
-                    RedstoneBlockHandler.forcePlaceRail(event);
-                    break;
+        if (event.isCancelled() || event.getItem() == null || event.getAction() != Action.RIGHT_CLICK_BLOCK) return;
 
-                case REDSTONE:
-                    RedstoneBlockHandler.forcePlaceRedstone(event);
-                    break;
+        Material blockMaterial = BlockUtil.convertToBlockMaterial(event.getItem());
+        if (blockMaterial == null) return;
 
-                case CAKE:
-                    GeneralBlockHandler.forcePlaceCake(event);
-                    break;
+        BlockData blockData = Bukkit.createBlockData(blockMaterial);
+        switch (blockMaterial) {
+            case RAIL:
+                RedstoneBlockHandler.forcePlaceRail(blockData, event);
+                break;
 
-                case SEA_PICKLE:
-                    GeneralBlockHandler.forcePlaceSeaPickle(event);
-                    break;
+            case ACTIVATOR_RAIL:
+            case DETECTOR_RAIL:
+            case POWERED_RAIL:
+                RedstoneBlockHandler.forcePlaceRedstoneRail(blockData, event);
+                break;
 
-                case SNOW:
-                    GeneralBlockHandler.forcePlaceSnow(event);
-                    break;
+            case REDSTONE_WIRE:
+                RedstoneBlockHandler.forcePlaceRedstone(blockData, event);
+                break;
 
-                case ACACIA_PRESSURE_PLATE:
-                case BIRCH_PRESSURE_PLATE:
-                case DARK_OAK_PRESSURE_PLATE:
-                case JUNGLE_PRESSURE_PLATE:
-                case OAK_PRESSURE_PLATE:
-                case SPRUCE_PRESSURE_PLATE:
-                case STONE_PRESSURE_PLATE:
-                    RedstoneBlockHandler.forcePlacePressurePlate(event);
-                    break;
+            case CAKE:
+                GeneralBlockHandler.forcePlaceCake(blockData, event);
+                break;
 
-                case HEAVY_WEIGHTED_PRESSURE_PLATE:
-                case LIGHT_WEIGHTED_PRESSURE_PLATE:
-                    RedstoneBlockHandler.forcePlaceWeightedPressurePlate(event);
-                    break;
+            case SEA_PICKLE:
+                GeneralBlockHandler.forcePlaceSeaPickle(blockData, event);
+                break;
 
-                case REPEATER:
-                    RedstoneBlockHandler.forcePlaceRepeater(event);
-                    break;
+            case SNOW:
+                GeneralBlockHandler.forcePlaceSnow(blockData, event);
+                break;
 
-                case COMPARATOR:
-                    RedstoneBlockHandler.forcePlaceComparator(event);
-                    break;
+            case ACACIA_PRESSURE_PLATE:
+            case BIRCH_PRESSURE_PLATE:
+            case DARK_OAK_PRESSURE_PLATE:
+            case JUNGLE_PRESSURE_PLATE:
+            case OAK_PRESSURE_PLATE:
+            case SPRUCE_PRESSURE_PLATE:
+            case STONE_PRESSURE_PLATE:
+                RedstoneBlockHandler.forcePlacePowerable(blockData, event);
+                break;
 
-                default:
-            }
+            case HEAVY_WEIGHTED_PRESSURE_PLATE:
+            case LIGHT_WEIGHTED_PRESSURE_PLATE:
+                RedstoneBlockHandler.forcePlaceWeightedPressurePlate(blockData, event);
+                break;
+
+            case REPEATER:
+                RedstoneBlockHandler.forcePlaceRepeater(blockData, event);
+                break;
+
+            case COMPARATOR:
+                RedstoneBlockHandler.forcePlaceComparator(blockData, event);
+                break;
+
+            case TRIPWIRE_HOOK:
+                RedstoneBlockHandler.forcePlaceTripwireHook(blockData, event);
+                break;
+
+            case NOTE_BLOCK:
+                NoteBlockHandler.forcePlaceNoteBlock(blockData, event);
+                break;
+
+            default:
         }
     }
 
     private void plantPlaceCheck(PlayerInteractEvent event) {
-        if (Config.DISABLE_PLANT_PLACEMENT_RULES && event.getAction() == Action.RIGHT_CLICK_BLOCK) {
-            switch (event.getItem().getType()) {
-                case GRASS:
-                case FERN:
-                case DEAD_BUSH:
-                case DANDELION:
-                case POPPY:
-                case BLUE_ORCHID:
-                case ALLIUM:
-                case AZURE_BLUET:
-                case RED_TULIP:
-                case ORANGE_TULIP:
-                case WHITE_TULIP:
-                case PINK_TULIP:
-                case OXEYE_DAISY:
-                case CORNFLOWER:
-                case LILY_OF_THE_VALLEY:
-                case WITHER_ROSE:
-                case RED_MUSHROOM:
-                case BROWN_MUSHROOM:
-                    GeneralBlockHandler.forcePlaceBlock(event);
-                    break;
+        if (!Config.DISABLE_PLANT_PLACEMENT_RULES || event.isCancelled() || event.getItem() == null || event.getAction() != Action.RIGHT_CLICK_BLOCK) return;
 
-                case WHEAT_SEEDS:
-                case WHEAT:
-                case BEETROOT_SEEDS:
-                case MELON_SEEDS:
-                case PUMPKIN_SEEDS:
-                case POTATO:
-                case CARROT:
-                case NETHER_WART:
-                case CACTUS:
-                case SUGAR_CANE:
-                    PlantHandler.forcePlaceAgingPlant(event);
-                    break;
+        Material blockMaterial = BlockUtil.convertToBlockMaterial(event.getItem());
+        if (blockMaterial == null) return;
 
-                case TALL_GRASS:
-                case LARGE_FERN:
-                case SUNFLOWER:
-                case LILAC:
-                case ROSE_BUSH:
-                case PEONY:
-                    PlantHandler.forcePlaceDoublePlant(event);
-                    break;
+        BlockData blockData = Bukkit.createBlockData(blockMaterial);
+        switch (blockMaterial) {
+            case GRASS:
+            case FERN:
+            case DEAD_BUSH:
+            case DANDELION:
+            case POPPY:
+            case BLUE_ORCHID:
+            case ALLIUM:
+            case AZURE_BLUET:
+            case RED_TULIP:
+            case ORANGE_TULIP:
+            case WHITE_TULIP:
+            case PINK_TULIP:
+            case OXEYE_DAISY:
+            case CORNFLOWER:
+            case LILY_OF_THE_VALLEY:
+            case WITHER_ROSE:
+            case RED_MUSHROOM:
+            case BROWN_MUSHROOM:
+                GeneralBlockHandler.forcePlaceBlock(blockData, event);
+                break;
 
-                case OAK_SAPLING:
-                case SPRUCE_SAPLING:
-                case BIRCH_SAPLING:
-                case JUNGLE_SAPLING:
-                case ACACIA_SAPLING:
-                case DARK_OAK_SAPLING:
-                    PlantHandler.forcePlaceSapling(event);
-                    break;
+            case WHEAT:
+            case BEETROOTS:
+            case PUMPKIN_STEM:
+            case MELON_STEM:
+            case CARROTS:
+            case POTATOES:
+            case NETHER_WART:
+            case CACTUS:
+            case SUGAR_CANE:
+                PlantHandler.forcePlaceAgingPlant(blockData, event);
+                break;
 
-                case CHORUS_PLANT:
-                case CHORUS_FLOWER:
-                    ChorusHandler.forcePlaceChorusPlant(event);
-                    break;
+            case TALL_GRASS:
+            case LARGE_FERN:
+            case SUNFLOWER:
+            case LILAC:
+            case ROSE_BUSH:
+            case PEONY:
+                PlantHandler.forcePlaceDoublePlant(blockData, event);
+                break;
 
-                case BAMBOO:
-                    PlantHandler.forcePlaceBamboo(event);
-                    break;
+            case OAK_SAPLING:
+            case SPRUCE_SAPLING:
+            case BIRCH_SAPLING:
+            case JUNGLE_SAPLING:
+            case ACACIA_SAPLING:
+            case DARK_OAK_SAPLING:
+                PlantHandler.forcePlaceSapling(blockData, event);
+                break;
 
-                default:
-            }
+            case CHORUS_PLANT:
+            case CHORUS_FLOWER:
+                ChorusHandler.forcePlaceChorusPlant(blockData, event);
+                break;
+
+            case BAMBOO:
+                PlantHandler.forcePlaceBamboo(blockData, event);
+                break;
+
+            default:
         }
     }
     

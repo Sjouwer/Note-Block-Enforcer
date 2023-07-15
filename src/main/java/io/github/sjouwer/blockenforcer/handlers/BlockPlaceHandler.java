@@ -9,6 +9,7 @@ import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
+import org.bukkit.block.data.BlockData;
 import org.bukkit.block.data.Waterlogged;
 import org.bukkit.craftbukkit.v1_14_R1.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_14_R1.inventory.CraftItemStack;
@@ -22,28 +23,21 @@ public class BlockPlaceHandler {
     private BlockPlaceHandler() {
     }
 
-    public static Block placeBlock(PlayerInteractEvent event) {
-        return BlockPlaceHandler.placeBlock(event, null);
+    public static Block placeBlock(PlayerInteractEvent event, BlockData dataOverride) {
+        return BlockPlaceHandler.placeBlock(event, dataOverride, null);
     }
 
-    public static Block placeBlock(PlayerInteractEvent event, Block blockOverride) {
+    public static Block placeBlock(PlayerInteractEvent event, BlockData blockData, Block blockOverride) {
         Block clickedBlock = event.getClickedBlock();
         ItemStack item = event.getItem();
 
         Block placementBlock = blockOverride == null ? getPlacementBlock(clickedBlock, event.getBlockFace()) : blockOverride;
-        if (placementBlock == null) {
-            return null;
-        }
-
-        Material blockMaterial = BlockUtil.convertToBlockMaterial(item);
-        if (blockMaterial == null) {
-            return null;
-        }
+        if (placementBlock == null) return null;
 
         BlockState replacedBlockState = placementBlock.getState();
-
         boolean waterLogged = placementBlock.getType() == Material.WATER;
-        placementBlock.setType(blockMaterial, false);
+
+        placementBlock.setBlockData(blockData, false);
         if (placementBlock.getBlockData() instanceof Waterlogged) {
             Waterlogged waterLoggable = ((Waterlogged) placementBlock.getBlockData());
             waterLoggable.setWaterlogged(waterLogged);
@@ -61,14 +55,10 @@ public class BlockPlaceHandler {
     }
 
     private static Block getPlacementBlock(Block clickedBlock, BlockFace face) {
-        if (BlockUtil.isReplaceable(clickedBlock)) {
-            return clickedBlock;
-        }
+        if (BlockUtil.isReplaceable(clickedBlock)) return clickedBlock;
 
         Block relativeBlock = clickedBlock.getRelative(face);
-        if (BlockUtil.isReplaceable(relativeBlock)) {
-            return relativeBlock;
-        }
+        if (BlockUtil.isReplaceable(relativeBlock)) return relativeBlock;
 
         return null;
     }

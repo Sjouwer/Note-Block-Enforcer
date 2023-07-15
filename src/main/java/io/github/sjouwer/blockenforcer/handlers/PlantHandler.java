@@ -7,6 +7,7 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.Ageable;
 import org.bukkit.block.data.Bisected;
+import org.bukkit.block.data.BlockData;
 import org.bukkit.block.data.type.Bamboo;
 import org.bukkit.block.data.type.Bamboo.Leaves;
 import org.bukkit.block.data.type.Sapling;
@@ -17,55 +18,50 @@ public class PlantHandler {
     private PlantHandler() {
     }
 
-    public static void forcePlaceDoublePlant(PlayerInteractEvent event) {
-        Block placedBlock = BlockPlaceHandler.placeBlock(event);
-        if (placedBlock == null) {
-            return;
-        }
+    public static void forcePlaceDoublePlant(BlockData blockData, PlayerInteractEvent event) {
+        if (!(blockData instanceof Bisected)) return;
 
-        event.setCancelled(true);
+        Bisected plantHalf = (Bisected) blockData;
 
         NBTTagCompound blockStateTag = BlockUtil.getBlockStateTag(event.getItem());
         if (blockStateTag != null) {
             String half = blockStateTag.getString("half");
-            if (!half.isEmpty()) setPlantHalf(placedBlock, stringToHalf(half));
-            return;
+            if (!half.isEmpty()) plantHalf.setHalf(stringToHalf(half));
         }
+        else {
+            plantHalf.setHalf(Bisected.Half.BOTTOM);
+        }
+
+        Block placedBlock = BlockPlaceHandler.placeBlock(event, plantHalf);
+        if (placedBlock == null) return;
+
+        event.setCancelled(true);
 
         Block plantTopBlock = placedBlock.getRelative(BlockFace.UP, 1);
-        if (BlockUtil.isReplaceable(plantTopBlock)) {
-            placedBlock = BlockPlaceHandler.placeBlock(event, plantTopBlock);
-            if (placedBlock == null) {
-                return;
-            }
-            setPlantHalf(placedBlock, Bisected.Half.TOP);
+        if (blockStateTag == null && BlockUtil.isReplaceable(plantTopBlock)) {
+            plantHalf.setHalf(Bisected.Half.TOP);
+            BlockPlaceHandler.placeBlock(event, plantHalf, plantTopBlock);
         }
-    }
 
-    private static void setPlantHalf(Block block, Bisected.Half half) {
-        if (block.getBlockData() instanceof Bisected) {
-            Bisected halfPlant = (Bisected) block.getBlockData();
-            halfPlant.setHalf(half);
-            block.setBlockData(halfPlant);
-            block.getState().update(true, false);
-        }
+        plantTopBlock.getState().update(true, false);
     }
 
     public static Bisected.Half stringToHalf(String string) {
-        if (string.equalsIgnoreCase("upper") || string.equalsIgnoreCase("top")) {
+        if (string.equalsIgnoreCase("UPPER") || string.equalsIgnoreCase("TOP")) {
             return Bisected.Half.TOP;
         }
         return Bisected.Half.BOTTOM;
     }
 
-    public static void forcePlaceAgingPlant(PlayerInteractEvent event) {
-        Block placedBlock = BlockPlaceHandler.placeBlock(event);
-        if (placedBlock == null) {
-            return;
-        }
+    public static void forcePlaceAgingPlant(BlockData blockData, PlayerInteractEvent event) {
+        if (!(blockData instanceof Ageable)) return;
 
-        int age = getPlantAge(event.getItem());
-        setPlantAge(placedBlock, age);
+        Ageable plant = (Ageable) blockData;
+        plant.setAge(getPlantAge(event.getItem()));
+
+        Block placedBlock = BlockPlaceHandler.placeBlock(event, plant);
+        if (placedBlock == null) return;
+
         event.setCancelled(true);
     }
 
@@ -83,66 +79,43 @@ public class PlantHandler {
         return 0;
     }
 
-    private static void setPlantAge(Block block, int age) {
-        if (block.getBlockData() instanceof Ageable) {
-            Ageable plant = (Ageable) block.getBlockData();
-            plant.setAge(age);
-            block.setBlockData(plant);
-            block.getState().update(true, false);
-        }
-    }
+    public static void forcePlaceSapling(BlockData blockData, PlayerInteractEvent event) {
+        if (!(blockData instanceof Sapling)) return;
 
-    public static void forcePlaceSapling(PlayerInteractEvent event) {
-        Block placedBlock = BlockPlaceHandler.placeBlock(event);
-        if (placedBlock == null) {
-            return;
-        }
+        Sapling sapling = (Sapling) blockData;
 
         NBTTagCompound blockStateTag = BlockUtil.getBlockStateTag(event.getItem());
         if (blockStateTag != null) {
-            Sapling sapling = (Sapling) placedBlock.getBlockData();
-
             String stage = blockStateTag.getString("stage");
             if (!stage.isEmpty()) sapling.setStage(Integer.parseInt(stage));
-
-            placedBlock.setBlockData(sapling);
-            placedBlock.getState().update(true, false);
         }
+
+        Block placedBlock = BlockPlaceHandler.placeBlock(event, sapling);
+        if (placedBlock == null) return;
 
         event.setCancelled(true);
     }
 
-    public static void forcePlaceBamboo(PlayerInteractEvent event) {
-        Block placedBlock = BlockPlaceHandler.placeBlock(event);
-        if (placedBlock == null) {
-            return;
-        }
+    public static void forcePlaceBamboo(BlockData blockData, PlayerInteractEvent event) {
+        if (!(blockData instanceof Bamboo)) return;
+
+        Bamboo bamboo = (Bamboo) blockData;
 
         NBTTagCompound blockStateTag = BlockUtil.getBlockStateTag(event.getItem());
         if (blockStateTag != null) {
-            Bamboo bamboo = (Bamboo) placedBlock.getBlockData();
-
             String age = blockStateTag.getString("age");
             if (!age.isEmpty()) bamboo.setAge(Integer.parseInt(age));
 
             String stage = blockStateTag.getString("stage");
             if (!stage.isEmpty()) bamboo.setStage(Integer.parseInt(stage));
 
-            String leaves = blockStateTag.getString("leaves");
-            if (!leaves.isEmpty()) bamboo.setLeaves(stringToLeaves(leaves));
-
-            placedBlock.setBlockData(bamboo);
-            placedBlock.getState().update(true, false);
+            String leaves = blockStateTag.getString("leaves").toUpperCase();
+            if (!leaves.isEmpty()) bamboo.setLeaves(Leaves.valueOf(leaves));
         }
+
+        Block placedBlock = BlockPlaceHandler.placeBlock(event, bamboo);
+        if (placedBlock == null) return;
 
         event.setCancelled(true);
-    }
-
-    private static Leaves stringToLeaves(String string) {
-        switch (string) {
-            case "small": return Leaves.SMALL;
-            case "large": return Leaves.LARGE;
-            default: return Leaves.NONE;
-        }
     }
 }

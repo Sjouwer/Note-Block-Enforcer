@@ -7,6 +7,7 @@ import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
+import org.bukkit.block.data.BlockData;
 import org.bukkit.block.data.type.Cake;
 import org.bukkit.block.data.type.SeaPickle;
 import org.bukkit.block.data.type.Snow;
@@ -17,61 +18,54 @@ public class GeneralBlockHandler {
     private GeneralBlockHandler() {
     }
 
-    public static void forcePlaceBlock(PlayerInteractEvent event) {
-        Block placementBlock = BlockPlaceHandler.placeBlock(event);
-        if (placementBlock == null) {
-            return;
-        }
+    public static void forcePlaceBlock(BlockData blockData, PlayerInteractEvent event) {
+        Block placementBlock = BlockPlaceHandler.placeBlock(event, blockData);
+        if (placementBlock == null) return;
 
         event.setCancelled(true);
     }
 
-    public static void forcePlaceCake(PlayerInteractEvent event) {
-        Block placedBlock = BlockPlaceHandler.placeBlock(event);
-        if (placedBlock == null) {
-            return;
-        }
+    public static void forcePlaceCake(BlockData blockData, PlayerInteractEvent event) {
+        if (!(blockData instanceof Cake)) return;
+
+        Cake cake = (Cake) blockData;
 
         NBTTagCompound blockStateTag = BlockUtil.getBlockStateTag(event.getItem());
         if (blockStateTag != null) {
-            Cake cake = (Cake) placedBlock.getBlockData();
-
             String bites = blockStateTag.getString("bites");
             if (!bites.isEmpty()) cake.setBites(Integer.parseInt(bites));
-
-            placedBlock.setBlockData(cake);
-            placedBlock.getState().update(true, false);
         }
+
+        Block placedBlock = BlockPlaceHandler.placeBlock(event, cake);
+        if (placedBlock == null) return;
 
         event.setCancelled(true);
     }
 
-    public static void forcePlaceSeaPickle(PlayerInteractEvent event) {
-        Block placedBlock = BlockPlaceHandler.placeBlock(event);
-        if (placedBlock == null) {
-            return;
-        }
+    public static void forcePlaceSeaPickle(BlockData blockData, PlayerInteractEvent event) {
+        if (!(blockData instanceof SeaPickle)) return;
+
+        SeaPickle pickle = (SeaPickle) blockData;
 
         NBTTagCompound blockStateTag = BlockUtil.getBlockStateTag(event.getItem());
         if (blockStateTag != null) {
-            SeaPickle pickle = (SeaPickle) placedBlock.getBlockData();
-
             String pickles = blockStateTag.getString("pickles");
             if (!pickles.isEmpty()) pickle.setPickles(Integer.parseInt(pickles));
 
             String waterlogged = blockStateTag.getString("waterlogged");
             if (!waterlogged.isEmpty()) pickle.setWaterlogged(Boolean.parseBoolean(waterlogged));
-
-            placedBlock.setBlockData(pickle);
-            placedBlock.getState().update(true, false);
         }
+
+        Block placedBlock = BlockPlaceHandler.placeBlock(event, pickle);
+        if (placedBlock == null) return;
 
         event.setCancelled(true);
     }
 
-    public static void forcePlaceSnow(PlayerInteractEvent event) {
-        NBTTagCompound blockStateTag = BlockUtil.getBlockStateTag(event.getItem());
+    public static void forcePlaceSnow(BlockData blockData, PlayerInteractEvent event) {
+        if (!(blockData instanceof Snow)) return;
 
+        NBTTagCompound blockStateTag = BlockUtil.getBlockStateTag(event.getItem());
         if (blockStateTag == null) {
             boolean layerAdded = false;
 
@@ -83,25 +77,18 @@ public class GeneralBlockHandler {
                 layerAdded = addSnowLayer(event.getClickedBlock().getRelative(event.getBlockFace()), event);
             }
 
-            if (layerAdded) {
-                return;
-            }
+            if (layerAdded) return;
         }
 
-        Block placedBlock = BlockPlaceHandler.placeBlock(event);
-        if (placedBlock == null) {
-            return;
-        }
+        Snow snow = (Snow) blockData;
 
         if (blockStateTag != null) {
-            Snow snow = (Snow) placedBlock.getBlockData();
-
             String layers = blockStateTag.getString("layers");
             if (!layers.isEmpty()) snow.setLayers(Integer.parseInt(layers));
-
-            placedBlock.setBlockData(snow);
-            placedBlock.getState().update(true, false);
         }
+
+        Block placedBlock = BlockPlaceHandler.placeBlock(event, snow);
+        if (placedBlock == null) return;
 
         event.setCancelled(true);
     }

@@ -65,7 +65,8 @@ public class BlockPhysicsListener implements Listener {
             if (block.getType() == Material.REDSTONE_WIRE) {
                 cancel = true;
             }
-            else if(event.getSourceBlock() == block) {
+
+            if (event.getSourceBlock() == block) {
                 RedstoneBlockHandler.stopRedstoneChange(block);
             }
         }

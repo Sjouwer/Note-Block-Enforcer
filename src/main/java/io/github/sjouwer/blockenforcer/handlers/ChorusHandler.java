@@ -4,6 +4,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
+import org.bukkit.block.data.BlockData;
 import org.bukkit.block.data.MultipleFacing;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerInteractEvent;
@@ -12,11 +13,9 @@ public class ChorusHandler {
     private ChorusHandler() {
     }
 
-    public static void forcePlaceChorusPlant(PlayerInteractEvent event) {
-        Block placedBlock = BlockPlaceHandler.placeBlock(event);
-        if (placedBlock == null) {
-            return;
-        }
+    public static void forcePlaceChorusPlant(BlockData blockData, PlayerInteractEvent event) {
+        Block placedBlock = BlockPlaceHandler.placeBlock(event, blockData);
+        if (placedBlock == null) return;
 
         if (event.getItem().getType() == Material.CHORUS_PLANT) {
             connectChorusPlants(placedBlock, event.getBlockFace(), event.getPlayer());

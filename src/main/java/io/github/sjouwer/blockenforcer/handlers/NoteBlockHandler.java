@@ -7,23 +7,22 @@ import org.bukkit.Material;
 import org.bukkit.Note;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
+import org.bukkit.block.data.BlockData;
 import org.bukkit.block.data.type.NoteBlock;
-import org.bukkit.inventory.ItemStack;
+import org.bukkit.event.player.PlayerInteractEvent;
 
 public class NoteBlockHandler {
     private NoteBlockHandler() {
     }
 
-    public static void forceNoteBlockNBTState(ItemStack item, Block block) {
-        if (item.getType() != Material.NOTE_BLOCK) {
-            return;
-        }
+    public static void forcePlaceNoteBlock(BlockData blockData, PlayerInteractEvent event) {
+        if (!(blockData instanceof NoteBlock)) return;
 
-        NBTTagCompound blockStateTag = BlockUtil.getBlockStateTag(item);
+        NoteBlock noteBlock = (NoteBlock) blockData;
+
+        NBTTagCompound blockStateTag = BlockUtil.getBlockStateTag(event.getItem());
         if (blockStateTag != null) {
-            NoteBlock noteBlock = (NoteBlock) block.getBlockData();
-
-            String instrument = blockStateTag.getString("instrument");
+            String instrument = blockStateTag.getString("instrument").toUpperCase();
             if (!instrument.isEmpty()) noteBlock.setInstrument(NoteBlockUtil.getInstrument(instrument));
 
             String note = blockStateTag.getString("note");
@@ -31,10 +30,12 @@ public class NoteBlockHandler {
 
             String powered = blockStateTag.getString("powered");
             if (!powered.isEmpty()) noteBlock.setPowered(Boolean.parseBoolean(powered));
-
-            block.setBlockData(noteBlock);
-            block.getState().update(true, false);
         }
+
+        Block placedBlock = BlockPlaceHandler.placeBlock(event, noteBlock);
+        if (placedBlock == null) return;
+
+        event.setCancelled(true);
     }
 
     public static void updateAllAboveNoteBlocks(Block blockAbove) {

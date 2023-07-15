@@ -11,7 +11,6 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.*;
 import org.bukkit.block.data.type.*;
 import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -84,48 +83,7 @@ public class RedstoneBlockHandler {
             updateRedstone(block);
         }
         else {
-            System.out.println("ping");
             scheduleRedstoneUpdate(block);
-        }
-    }
-
-    public static void forcePlaceRedstone(PlayerInteractEvent event) {
-        Block placedBlock = BlockPlaceHandler.placeBlock(event);
-        if (placedBlock == null) {
-            return;
-        }
-
-        stopRedstoneChange(placedBlock);
-
-        placedBlock.getState().update(true, false);
-        event.setCancelled(true);
-    }
-
-    public static void forceRedstoneNBTState(ItemStack item, Block block) {
-        if (item.getType() != Material.REDSTONE) {
-            return;
-        }
-
-        NBTTagCompound blockStateTag = BlockUtil.getBlockStateTag(item);
-        if (blockStateTag != null) {
-            RedstoneWire redstoneWire = (RedstoneWire) block.getBlockData();
-
-            String note = blockStateTag.getString("power");
-            if (!note.isEmpty()) redstoneWire.setPower(Integer.parseInt(note));
-
-            String north = blockStateTag.getString("north").toUpperCase();
-            if (!north.isEmpty()) redstoneWire.setFace(BlockFace.NORTH, RedstoneWire.Connection.valueOf(north));
-
-            String east = blockStateTag.getString("east").toUpperCase();
-            if (!north.isEmpty()) redstoneWire.setFace(BlockFace.EAST, RedstoneWire.Connection.valueOf(east));
-
-            String south = blockStateTag.getString("south").toUpperCase();
-            if (!north.isEmpty()) redstoneWire.setFace(BlockFace.SOUTH, RedstoneWire.Connection.valueOf(south));
-
-            String west = blockStateTag.getString("west").toUpperCase();
-            if (!north.isEmpty()) redstoneWire.setFace(BlockFace.WEST, RedstoneWire.Connection.valueOf(west));
-
-            block.setBlockData(redstoneWire);
         }
     }
 
@@ -165,29 +123,6 @@ public class RedstoneBlockHandler {
         updateRedstoneNow(block.getRelative(BlockFace.EAST));
         updateRedstoneNow(block.getRelative(BlockFace.SOUTH));
         updateRedstoneNow(block.getRelative(BlockFace.WEST));
-    }
-
-    public static void forceHookNBTState(ItemStack item, Block block) {
-        if (item.getType() != Material.TRIPWIRE_HOOK) {
-            return;
-        }
-
-        NBTTagCompound blockStateTag = BlockUtil.getBlockStateTag(item);
-        if (blockStateTag != null) {
-            TripwireHook hook = (TripwireHook) block.getBlockData();
-
-            String attached = blockStateTag.getString("attached");
-            if (!attached.isEmpty()) hook.setAttached(Boolean.parseBoolean(attached));
-
-            String facing = blockStateTag.getString("facing").toUpperCase();
-            if (!facing.isEmpty()) hook.setFacing(BlockFace.valueOf(facing));
-
-            String powered = blockStateTag.getString("powered");
-            if (!powered.isEmpty()) hook.setPowered(Boolean.parseBoolean(powered));
-
-            block.setBlockData(hook);
-            block.getState().update(true, false);
-        }
     }
 
     public static void stopTripwireChange(Block block) {
@@ -231,51 +166,74 @@ public class RedstoneBlockHandler {
         relatedBlock.getState().update(true, false);
     }
 
-    public static void forcePlacePressurePlate(PlayerInteractEvent event) {
-        Block placedBlock = BlockPlaceHandler.placeBlock(event);
-        if (placedBlock == null) {
-            return;
+    public static void forcePlaceRedstone(BlockData blockData, PlayerInteractEvent event) {
+        if (!(blockData instanceof RedstoneWire)) return;
+
+        RedstoneWire redstoneWire = (RedstoneWire) blockData;
+
+        NBTTagCompound blockStateTag = BlockUtil.getBlockStateTag(event.getItem());
+        if (blockStateTag != null) {
+            String power = blockStateTag.getString("power");
+            if (!power.isEmpty()) redstoneWire.setPower(Integer.parseInt(power));
+
+            String north = blockStateTag.getString("north").toUpperCase();
+            if (!north.isEmpty()) redstoneWire.setFace(BlockFace.NORTH, RedstoneWire.Connection.valueOf(north));
+
+            String east = blockStateTag.getString("east").toUpperCase();
+            if (!north.isEmpty()) redstoneWire.setFace(BlockFace.EAST, RedstoneWire.Connection.valueOf(east));
+
+            String south = blockStateTag.getString("south").toUpperCase();
+            if (!north.isEmpty()) redstoneWire.setFace(BlockFace.SOUTH, RedstoneWire.Connection.valueOf(south));
+
+            String west = blockStateTag.getString("west").toUpperCase();
+            if (!north.isEmpty()) redstoneWire.setFace(BlockFace.WEST, RedstoneWire.Connection.valueOf(west));
         }
+
+        Block placedBlock = BlockPlaceHandler.placeBlock(event, redstoneWire);
+        if (placedBlock == null) return;
+
+        event.setCancelled(true);
+    }
+
+    public static void forcePlacePowerable(BlockData blockData, PlayerInteractEvent event) {
+        if (!(blockData instanceof Powerable)) return;
+
+        Powerable powerable = (Powerable) blockData;
 
         NBTTagCompound blockStateTag = BlockUtil.getBlockStateTag(event.getItem());
         if (blockStateTag != null) {
             String powered = blockStateTag.getString("powered");
-            if (!powered.isEmpty()) setPowered(placedBlock, Boolean.parseBoolean(powered));
+            if (!powered.isEmpty()) powerable.setPowered(Boolean.parseBoolean(powered));
         }
 
-        placedBlock.getState().update(true, false);
-        stopRedstoneChange(placedBlock);
+        Block placedBlock = BlockPlaceHandler.placeBlock(event, powerable);
+        if (placedBlock == null) return;
+
         event.setCancelled(true);
     }
 
-    public static void forcePlaceWeightedPressurePlate(PlayerInteractEvent event) {
-        Block placedBlock = BlockPlaceHandler.placeBlock(event);
-        if (placedBlock == null) {
-            return;
-        }
+    public static void forcePlaceWeightedPressurePlate(BlockData blockData, PlayerInteractEvent event) {
+        if (!(blockData instanceof AnaloguePowerable)) return;
+
+        AnaloguePowerable plate = (AnaloguePowerable) blockData;
 
         NBTTagCompound blockStateTag = BlockUtil.getBlockStateTag(event.getItem());
         if (blockStateTag != null) {
-            AnaloguePowerable plate = (AnaloguePowerable) placedBlock.getBlockData();
-
             String power = blockStateTag.getString("power");
             if (!power.isEmpty()) plate.setPower(Integer.parseInt(power));
-
-            placedBlock.setBlockData(plate);
         }
 
-        stopRedstoneChange(placedBlock);
-        placedBlock.getState().update(true, false);
+        Block placedBlock = BlockPlaceHandler.placeBlock(event, plate);
+        if (placedBlock == null) return;
+
         event.setCancelled(true);
     }
 
-    public static void forcePlaceRepeater(PlayerInteractEvent event) {
-        Block placedBlock = BlockPlaceHandler.placeBlock(event);
-        if (placedBlock == null) {
-            return;
-        }
+    public static void forcePlaceRepeater(BlockData blockData, PlayerInteractEvent event) {
+        if (!(blockData instanceof Repeater)) return;
 
-        Repeater repeater = (Repeater) placedBlock.getBlockData();
+        Repeater repeater = (Repeater) blockData;
+
         NBTTagCompound blockStateTag = BlockUtil.getBlockStateTag(event.getItem());
         if (blockStateTag != null) {
             String powered = blockStateTag.getString("powered");
@@ -293,20 +251,18 @@ public class RedstoneBlockHandler {
             facing = event.getPlayer().getFacing().getOppositeFace();
         }
         repeater.setFacing(facing);
-        placedBlock.setBlockData(repeater);
 
-        stopRedstoneChange(placedBlock);
-        placedBlock.getState().update(true, false);
+        Block placedBlock = BlockPlaceHandler.placeBlock(event, repeater);
+        if (placedBlock == null) return;
+
         event.setCancelled(true);
     }
 
-    public static void forcePlaceComparator(PlayerInteractEvent event) {
-        Block placedBlock = BlockPlaceHandler.placeBlock(event);
-        if (placedBlock == null) {
-            return;
-        }
+    public static void forcePlaceComparator(BlockData blockData, PlayerInteractEvent event) {
+        if (!(blockData instanceof Comparator)) return;
 
-        Comparator comparator = (Comparator) placedBlock.getBlockData();
+        Comparator comparator = (Comparator) blockData;
+
         NBTTagCompound blockStateTag = BlockUtil.getBlockStateTag(event.getItem());
         if (blockStateTag != null) {
             String powered = blockStateTag.getString("powered");
@@ -321,47 +277,73 @@ public class RedstoneBlockHandler {
             facing = event.getPlayer().getFacing().getOppositeFace();
         }
         comparator.setFacing(facing);
-        placedBlock.setBlockData(comparator);
 
-        stopRedstoneChange(placedBlock);
-        placedBlock.getState().update(true, false);
+        Block placedBlock = BlockPlaceHandler.placeBlock(event, comparator);
+        if (placedBlock == null) return;
+
         event.setCancelled(true);
     }
 
-    public static void forcePlaceRail(PlayerInteractEvent event) {
+    public static void forcePlaceRail(BlockData blockData, PlayerInteractEvent event) {
+        if (!(blockData instanceof Rail)) return;
+
         NBTTagCompound blockStateTag = BlockUtil.getBlockStateTag(event.getItem());
-        if (blockStateTag == null) {
-            return;
-        }
+        if (blockStateTag == null) return;
 
-        Block placedBlock = BlockPlaceHandler.placeBlock(event);
-        if (placedBlock == null) {
-            return;
-        }
-
-        String powered = blockStateTag.getString("powered");
-        if (!powered.isEmpty()) setPowered(placedBlock, Boolean.parseBoolean(powered));
+        Rail rail = (Rail) blockData;
 
         String shape = blockStateTag.getString("shape").toUpperCase();
-        if (!shape.isEmpty()) setRailShape(placedBlock, Rail.Shape.valueOf(shape));
+        if (!shape.isEmpty()) rail.setShape(Rail.Shape.valueOf(shape));
 
-        placedBlock.getState().update(true, false);
+        Block placedBlock = BlockPlaceHandler.placeBlock(event, rail);
+        if (placedBlock == null) return;
+
         event.setCancelled(true);
     }
 
-    public static void setPowered(Block block, boolean poweredState) {
-        if (block.getBlockData() instanceof Powerable) {
-            Powerable powerable = (Powerable) block.getBlockData();
-            powerable.setPowered(poweredState);
-            block.setBlockData(powerable);
-        }
+    public static void forcePlaceRedstoneRail(BlockData blockData, PlayerInteractEvent event) {
+        if (!(blockData instanceof RedstoneRail)) return;
+
+        NBTTagCompound blockStateTag = BlockUtil.getBlockStateTag(event.getItem());
+        if (blockStateTag == null) return;
+
+        RedstoneRail redstoneRail = (RedstoneRail) blockData;
+
+        String shape = blockStateTag.getString("shape").toUpperCase();
+        if (!shape.isEmpty()) redstoneRail.setShape(Rail.Shape.valueOf(shape));
+
+        String powered = blockStateTag.getString("powered");
+        if (!powered.isEmpty()) redstoneRail.setPowered(Boolean.parseBoolean(powered));
+
+        Block placedBlock = BlockPlaceHandler.placeBlock(event, redstoneRail);
+        if (placedBlock == null) return;
+
+        event.setCancelled(true);
     }
 
-    private static void setRailShape(Block block, Rail.Shape shape) {
-        if (block.getBlockData() instanceof Rail) {
-            Rail rail = (Rail) block.getBlockData();
-            rail.setShape(shape);
-            block.setBlockData(rail);
+    public static void forcePlaceTripwireHook(BlockData blockData, PlayerInteractEvent event) {
+        if (!(blockData instanceof TripwireHook)) return;
+
+        TripwireHook hook = (TripwireHook) blockData;
+
+        NBTTagCompound blockStateTag = BlockUtil.getBlockStateTag(event.getItem());
+        if (blockStateTag != null) {
+            String attached = blockStateTag.getString("attached");
+            if (!attached.isEmpty()) hook.setAttached(Boolean.parseBoolean(attached));
+
+            String powered = blockStateTag.getString("powered");
+            if (!powered.isEmpty()) hook.setPowered(Boolean.parseBoolean(powered));
         }
+
+        BlockFace facing = event.getBlockFace();
+        if (facing == BlockFace.UP || facing == BlockFace.DOWN) {
+            facing = event.getPlayer().getFacing().getOppositeFace();
+        }
+        hook.setFacing(facing);
+
+        Block placedBlock = BlockPlaceHandler.placeBlock(event, hook);
+        if (placedBlock == null) return;
+
+        event.setCancelled(true);
     }
 }
