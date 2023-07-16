@@ -31,6 +31,7 @@ public class BlockEnforcer extends JavaPlugin {
         config.addDefault("Stop-Falling-Blocks", true);
         config.addDefault("Disable-Plant-Placement-Rules", true);
         config.addDefault("Enable_Structure_Blocks", true);
+        config.addDefault("Disable_Piston_Movement", true);
         config.options().copyDefaults(true);
         saveConfig();
 
@@ -38,6 +39,7 @@ public class BlockEnforcer extends JavaPlugin {
         Bukkit.getPluginManager().registerEvents(new BlockPhysicsListener(), BlockEnforcer.plugin);
         Bukkit.getPluginManager().registerEvents(new BlockPlaceListener(), BlockEnforcer.plugin);
         Bukkit.getPluginManager().registerEvents(new PlayerInteractListener(), BlockEnforcer.plugin);
+        Bukkit.getPluginManager().registerEvents(new PistonListener(), BlockEnforcer.plugin);
     }
 
     @Override

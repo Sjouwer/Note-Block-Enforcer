@@ -16,6 +16,8 @@ public class Config {
     public static final boolean OVERRIDE_NOTE_BLOCK_CLICK = BlockEnforcer.getPlugin().getConfig().getBoolean("Override-NoteBlock-Right-Click");
     public static final boolean FIX_TOOL_DESYNC = BlockEnforcer.getPlugin().getConfig().getBoolean("Fix_Tool_Desync");
     public static final boolean ENABLE_STRUCTURE_BLOCKS = BlockEnforcer.getPlugin().getConfig().getBoolean("Enable_Structure_Blocks");
+    public static final boolean DISABLE_PISTON_MOVEMENT = BlockEnforcer.getPlugin().getConfig().getBoolean("Disable_Piston_Movement");
+
     private static Material pickerTool = Material.BONE;
 
     static {
