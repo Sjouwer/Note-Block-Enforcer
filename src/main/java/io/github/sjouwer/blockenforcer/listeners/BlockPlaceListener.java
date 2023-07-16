@@ -33,7 +33,7 @@ public class BlockPlaceListener implements Listener {
 
         ItemMeta meta = event.getItemInHand().getItemMeta();
         if (meta != null && meta.hasLore()) {
-            BiomeHandler.changeBiome(event.getBlockPlaced(), meta, event.getPlayer());
+            BiomeHandler.changeBiome(placedBlock, meta, event.getPlayer());
         }
     }
 }

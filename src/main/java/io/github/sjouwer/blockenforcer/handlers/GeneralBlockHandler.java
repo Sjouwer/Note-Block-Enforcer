@@ -8,9 +8,8 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.data.BlockData;
-import org.bukkit.block.data.type.Cake;
-import org.bukkit.block.data.type.SeaPickle;
-import org.bukkit.block.data.type.Snow;
+import org.bukkit.block.data.type.*;
+import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 
@@ -57,6 +56,23 @@ public class GeneralBlockHandler {
         }
 
         Block placedBlock = BlockPlaceHandler.placeBlock(event, pickle);
+        if (placedBlock == null) return;
+
+        event.setCancelled(true);
+    }
+
+    public static void forcePlaceStructureBlock(BlockData blockData, PlayerInteractEvent event) {
+        if (!(blockData instanceof StructureBlock)) return;
+
+        StructureBlock structureBlock = (StructureBlock) blockData;
+
+        NBTTagCompound blockStateTag = BlockUtil.getBlockStateTag(event.getItem());
+        if (blockStateTag != null) {
+            String mode = blockStateTag.getString("mode").toUpperCase();
+            if (!mode.isEmpty()) structureBlock.setMode(StructureBlock.Mode.valueOf(mode));
+        }
+
+        Block placedBlock = BlockPlaceHandler.placeBlock(event, structureBlock);
         if (placedBlock == null) return;
 
         event.setCancelled(true);
@@ -113,5 +129,11 @@ public class GeneralBlockHandler {
         }
 
         return false;
+    }
+
+    public static void breakBlockWithoutUpdates(Block block) {
+        block.setBlockData(Bukkit.createBlockData(Material.AIR), false);
+        block.getState().update(true, false);
+        RedstoneBlockHandler.updateRedstone(block, true);
     }
 }

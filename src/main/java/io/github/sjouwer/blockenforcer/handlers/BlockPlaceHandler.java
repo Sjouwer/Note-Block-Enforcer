@@ -51,6 +51,7 @@ public class BlockPlaceHandler {
             return null;
         }
 
+        RedstoneBlockHandler.stopRedstoneChange(placementBlock);
         return placementBlock;
     }
 

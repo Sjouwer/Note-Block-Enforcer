@@ -1,8 +1,7 @@
 package io.github.sjouwer.blockenforcer.listeners;
 
 import io.github.sjouwer.blockenforcer.Config;
-import io.github.sjouwer.blockenforcer.handlers.RedstoneBlockHandler;
-import org.bukkit.Bukkit;
+import io.github.sjouwer.blockenforcer.handlers.GeneralBlockHandler;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.event.EventHandler;
@@ -17,10 +16,8 @@ public class BlockBreakListener implements Listener {
         Block block = event.getBlock();
 
         if (Config.STOP_REDSTONE_UPDATES && block.getType() == Material.REDSTONE_WIRE) {
+            GeneralBlockHandler.breakBlockWithoutUpdates(block);
             event.setCancelled(true);
-            block.setBlockData(Bukkit.createBlockData(Material.AIR), false);
-            block.getState().update(true, false);
-            RedstoneBlockHandler.updateRedstone(block, true);
         }
     }
 }

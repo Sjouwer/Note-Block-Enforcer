@@ -14,19 +14,11 @@ public class Config {
     public static final boolean DISABLE_PLANT_PLACEMENT_RULES = BlockEnforcer.getPlugin().getConfig().getBoolean("Disable-Plant-Placement-Rules");
     public static final boolean STOP_TURTLE_EGG_UPDATES = BlockEnforcer.getPlugin().getConfig().getBoolean("Stop-Turtle-Egg-Updates");
     public static final boolean OVERRIDE_NOTE_BLOCK_CLICK = BlockEnforcer.getPlugin().getConfig().getBoolean("Override-NoteBlock-Right-Click");
-    public static final boolean FIX_WE_WAND_DESYNC = BlockEnforcer.getPlugin().getConfig().getBoolean("Fix_WE_Wand_Desync");
-    private static Material weWand = Material.WOODEN_AXE;
+    public static final boolean FIX_TOOL_DESYNC = BlockEnforcer.getPlugin().getConfig().getBoolean("Fix_Tool_Desync");
+    public static final boolean ENABLE_STRUCTURE_BLOCKS = BlockEnforcer.getPlugin().getConfig().getBoolean("Enable_Structure_Blocks");
     private static Material pickerTool = Material.BONE;
 
     static {
-        String configWand = BlockEnforcer.getPlugin().getConfig().getString("WE-Wand");
-        if (configWand != null) {
-            Material material = Material.getMaterial(configWand.toUpperCase());
-            if (material != null) {
-                weWand = material;
-            }
-        }
-
         String configTool = BlockEnforcer.getPlugin().getConfig().getString("BlockState-Picker-Tool");
         if (configTool != null) {
             Material material = Material.getMaterial(configTool.toUpperCase());
@@ -37,10 +29,6 @@ public class Config {
     }
 
     private Config() {
-    }
-
-    public static Material getWEWand() {
-        return weWand;
     }
 
     public static Material getPickerTool() {

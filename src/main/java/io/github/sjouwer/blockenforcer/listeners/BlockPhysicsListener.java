@@ -22,15 +22,16 @@ public class BlockPhysicsListener implements Listener {
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onBlockPhysics(BlockPhysicsEvent event) {
         Block block = event.getBlock();
+        Material material = block.getType();
         boolean cancel = false;
 
         if (Config.DISABLE_CHORUS_PLACEMENT_RULES &&
-                (block.getType() == Material.CHORUS_PLANT || block.getType() == Material.CHORUS_FLOWER)) {
+                (material == Material.CHORUS_PLANT || material == Material.CHORUS_FLOWER)) {
             cancel = true;
         }
 
         if (Config.STOP_NOTE_BLOCK_UPDATES) {
-            if (block.getType() == Material.NOTE_BLOCK) {
+            if (material == Material.NOTE_BLOCK) {
                 cancel = true;
             }
 
@@ -53,7 +54,7 @@ public class BlockPhysicsListener implements Listener {
         }
 
         if (Config.STOP_TRIPWIRE_UPDATES) {
-            if (block.getType() == Material.TRIPWIRE) {
+            if (material == Material.TRIPWIRE) {
                 cancel = true;
             }
             else if(event.getSourceBlock() == block) {
@@ -62,7 +63,7 @@ public class BlockPhysicsListener implements Listener {
         }
 
         if (Config.STOP_REDSTONE_UPDATES) {
-            if (block.getType() == Material.REDSTONE_WIRE) {
+            if (material == Material.REDSTONE_WIRE) {
                 cancel = true;
             }
 

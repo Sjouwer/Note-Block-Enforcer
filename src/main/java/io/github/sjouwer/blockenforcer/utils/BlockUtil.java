@@ -66,14 +66,14 @@ public class BlockUtil {
         ItemStack stack;
         Material blockMaterial = block.getType();
 
-        Material itemMaterial = materialBiMap.getOrDefault(blockMaterial, null);
-        if (itemMaterial != null) {
-            stack = new ItemStack(itemMaterial);
+        if (blockMaterial.isItem()) {
+            stack = new ItemStack(blockMaterial);
             return stack;
         }
 
-        if (blockMaterial.isItem()) {
-            stack = new ItemStack(blockMaterial);
+        Material itemMaterial = materialBiMap.getOrDefault(blockMaterial, null);
+        if (itemMaterial != null) {
+            stack = new ItemStack(itemMaterial);
             return stack;
         }
 
