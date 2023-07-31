@@ -2,6 +2,7 @@ package io.github.sjouwer.blockenforcer.handlers;
 
 import io.github.sjouwer.blockenforcer.BlockEnforcer;
 import io.github.sjouwer.blockenforcer.Config;
+import io.github.sjouwer.blockenforcer.utils.BlockUtil;
 import net.minecraft.server.v1_14_R1.NBTTagCompound;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -336,5 +337,37 @@ public class RedstoneBlockHandler {
         if (placedBlock == null) return;
 
         event.setCancelled(true);
+    }
+
+    public static void forcePlaceDoor(BlockData blockData, NBTTagCompound blockStateTag, PlayerInteractEvent event) {
+        if (!(blockData instanceof Door)) return;
+
+        Door door = (Door) blockData;
+
+        if (blockStateTag != null) {
+            String hinge = blockStateTag.getString("hinge").toUpperCase();
+            if (!hinge.isEmpty()) door.setHinge(Door.Hinge.valueOf(hinge));
+
+            String powered = blockStateTag.getString("powered");
+            if (!powered.isEmpty()) door.setPowered(Boolean.parseBoolean(powered));
+        }
+
+        BlockFace facing = event.getBlockFace();
+        if (facing == BlockFace.UP || facing == BlockFace.DOWN) {
+            facing = event.getPlayer().getFacing().getOppositeFace();
+        }
+        door.setFacing(facing);
+        door.setHalf(Bisected.Half.BOTTOM);
+
+        Block placedBlock = BlockPlaceHandler.placeBlock(event, door);
+        if (placedBlock == null) return;
+
+        event.setCancelled(true);
+
+        Block doorTopBlock = placedBlock.getRelative(BlockFace.UP, 1);
+        if (BlockUtil.isReplaceable(doorTopBlock)) {
+            door.setHalf(Bisected.Half.TOP);
+            BlockPlaceHandler.placeBlock(event, door, doorTopBlock);
+        }
     }
 }

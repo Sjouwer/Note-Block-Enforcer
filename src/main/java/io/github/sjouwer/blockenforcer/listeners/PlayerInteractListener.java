@@ -157,6 +157,16 @@ public class PlayerInteractListener implements Listener {
                 NoteBlockHandler.forcePlaceNoteBlock(blockData, blockStateTag, event);
                 break;
 
+            case ACACIA_DOOR:
+            case BIRCH_DOOR:
+            case DARK_OAK_DOOR:
+            case JUNGLE_DOOR:
+            case OAK_DOOR:
+            case SPRUCE_DOOR:
+            case IRON_DOOR:
+                RedstoneBlockHandler.forcePlaceDoor(blockData, blockStateTag, event);
+                break;
+
             case STRUCTURE_BLOCK:
                 if (Config.ENABLE_STRUCTURE_BLOCKS) {
                     GeneralBlockHandler.forcePlaceStructureBlock(blockData, blockStateTag, event);
