@@ -229,7 +229,7 @@ public class PlayerInteractListener implements Listener {
             case NETHER_WART:
             case CACTUS:
             case SUGAR_CANE:
-            case SWEET_BERRIES:
+            case SWEET_BERRY_BUSH:
                 PlantHandler.forcePlaceAgingPlant(blockData, blockStateTag, event);
                 break;
 
