@@ -2,7 +2,6 @@ package io.github.sjouwer.blockenforcer.handlers;
 
 import io.github.sjouwer.blockenforcer.BlockEnforcer;
 import io.github.sjouwer.blockenforcer.Config;
-import io.github.sjouwer.blockenforcer.utils.BlockUtil;
 import net.minecraft.server.v1_14_R1.NBTTagCompound;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -166,12 +165,11 @@ public class RedstoneBlockHandler {
         relatedBlock.getState().update(true, false);
     }
 
-    public static void forcePlaceRedstone(BlockData blockData, PlayerInteractEvent event) {
+    public static void forcePlaceRedstone(BlockData blockData, NBTTagCompound blockStateTag, PlayerInteractEvent event) {
         if (!(blockData instanceof RedstoneWire)) return;
 
         RedstoneWire redstoneWire = (RedstoneWire) blockData;
 
-        NBTTagCompound blockStateTag = BlockUtil.getBlockStateTag(event.getItem());
         if (blockStateTag != null) {
             String power = blockStateTag.getString("power");
             if (!power.isEmpty()) redstoneWire.setPower(Integer.parseInt(power));
@@ -195,12 +193,11 @@ public class RedstoneBlockHandler {
         event.setCancelled(true);
     }
 
-    public static void forcePlacePowerable(BlockData blockData, PlayerInteractEvent event) {
+    public static void forcePlacePowerable(BlockData blockData, NBTTagCompound blockStateTag, PlayerInteractEvent event) {
         if (!(blockData instanceof Powerable)) return;
 
         Powerable powerable = (Powerable) blockData;
 
-        NBTTagCompound blockStateTag = BlockUtil.getBlockStateTag(event.getItem());
         if (blockStateTag != null) {
             String powered = blockStateTag.getString("powered");
             if (!powered.isEmpty()) powerable.setPowered(Boolean.parseBoolean(powered));
@@ -212,12 +209,11 @@ public class RedstoneBlockHandler {
         event.setCancelled(true);
     }
 
-    public static void forcePlaceWeightedPressurePlate(BlockData blockData, PlayerInteractEvent event) {
+    public static void forcePlaceWeightedPressurePlate(BlockData blockData, NBTTagCompound blockStateTag, PlayerInteractEvent event) {
         if (!(blockData instanceof AnaloguePowerable)) return;
 
         AnaloguePowerable plate = (AnaloguePowerable) blockData;
 
-        NBTTagCompound blockStateTag = BlockUtil.getBlockStateTag(event.getItem());
         if (blockStateTag != null) {
             String power = blockStateTag.getString("power");
             if (!power.isEmpty()) plate.setPower(Integer.parseInt(power));
@@ -229,12 +225,11 @@ public class RedstoneBlockHandler {
         event.setCancelled(true);
     }
 
-    public static void forcePlaceRepeater(BlockData blockData, PlayerInteractEvent event) {
+    public static void forcePlaceRepeater(BlockData blockData, NBTTagCompound blockStateTag, PlayerInteractEvent event) {
         if (!(blockData instanceof Repeater)) return;
 
         Repeater repeater = (Repeater) blockData;
 
-        NBTTagCompound blockStateTag = BlockUtil.getBlockStateTag(event.getItem());
         if (blockStateTag != null) {
             String powered = blockStateTag.getString("powered");
             if (!powered.isEmpty()) repeater.setPowered(Boolean.parseBoolean(powered));
@@ -258,12 +253,11 @@ public class RedstoneBlockHandler {
         event.setCancelled(true);
     }
 
-    public static void forcePlaceComparator(BlockData blockData, PlayerInteractEvent event) {
+    public static void forcePlaceComparator(BlockData blockData, NBTTagCompound blockStateTag, PlayerInteractEvent event) {
         if (!(blockData instanceof Comparator)) return;
 
         Comparator comparator = (Comparator) blockData;
 
-        NBTTagCompound blockStateTag = BlockUtil.getBlockStateTag(event.getItem());
         if (blockStateTag != null) {
             String powered = blockStateTag.getString("powered");
             if (!powered.isEmpty()) comparator.setPowered(Boolean.parseBoolean(powered));
@@ -284,10 +278,9 @@ public class RedstoneBlockHandler {
         event.setCancelled(true);
     }
 
-    public static void forcePlaceRail(BlockData blockData, PlayerInteractEvent event) {
+    public static void forcePlaceRail(BlockData blockData, NBTTagCompound blockStateTag, PlayerInteractEvent event) {
         if (!(blockData instanceof Rail)) return;
 
-        NBTTagCompound blockStateTag = BlockUtil.getBlockStateTag(event.getItem());
         if (blockStateTag == null) return;
 
         Rail rail = (Rail) blockData;
@@ -301,10 +294,9 @@ public class RedstoneBlockHandler {
         event.setCancelled(true);
     }
 
-    public static void forcePlaceRedstoneRail(BlockData blockData, PlayerInteractEvent event) {
+    public static void forcePlaceRedstoneRail(BlockData blockData, NBTTagCompound blockStateTag, PlayerInteractEvent event) {
         if (!(blockData instanceof RedstoneRail)) return;
 
-        NBTTagCompound blockStateTag = BlockUtil.getBlockStateTag(event.getItem());
         if (blockStateTag == null) return;
 
         RedstoneRail redstoneRail = (RedstoneRail) blockData;
@@ -321,12 +313,11 @@ public class RedstoneBlockHandler {
         event.setCancelled(true);
     }
 
-    public static void forcePlaceTripwireHook(BlockData blockData, PlayerInteractEvent event) {
+    public static void forcePlaceTripwireHook(BlockData blockData, NBTTagCompound blockStateTag, PlayerInteractEvent event) {
         if (!(blockData instanceof TripwireHook)) return;
 
         TripwireHook hook = (TripwireHook) blockData;
 
-        NBTTagCompound blockStateTag = BlockUtil.getBlockStateTag(event.getItem());
         if (blockStateTag != null) {
             String attached = blockStateTag.getString("attached");
             if (!attached.isEmpty()) hook.setAttached(Boolean.parseBoolean(attached));

@@ -4,9 +4,9 @@ import io.github.sjouwer.blockenforcer.Config;
 import io.github.sjouwer.blockenforcer.handlers.*;
 import io.github.sjouwer.blockenforcer.tools.BlockStatePicker;
 import io.github.sjouwer.blockenforcer.utils.BlockUtil;
+import net.minecraft.server.v1_14_R1.NBTTagCompound;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
-import org.bukkit.Tag;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.BlockData;
@@ -32,21 +32,10 @@ public class PlayerInteractListener implements Listener {
         if (event.getHand() == null) return;
         doorUpdateCheck(event);
 
-        if (isInteractable(event.getClickedBlock()) && !event.getPlayer().isSneaking()) return;
+        if (BlockUtil.isInteractable(event.getClickedBlock()) && !event.getPlayer().isSneaking()) return;
 
         blockPlaceCheck(event);
-        plantPlaceCheck(event);
         noteBlockClickCheck(event);
-    }
-
-    private boolean isInteractable(Block block) {
-        Material type = block.getType();
-        return type.isInteractable() &&
-                type != Material.NOTE_BLOCK &&
-                type != Material.CAKE &&
-                type != Material.STRUCTURE_BLOCK &&
-                !Tag.FENCES.isTagged(type) &&
-                !Tag.STAIRS.isTagged(type);
     }
 
     private void doorUpdateCheck(PlayerInteractEvent event) {
@@ -105,35 +94,36 @@ public class PlayerInteractListener implements Listener {
             return;
         }
 
-        Material blockMaterial = BlockUtil.convertToBlockMaterial(event.getItem());
+        NBTTagCompound blockStateTag = BlockUtil.getBlockStateTag(event.getItem());
+        Material blockMaterial = BlockUtil.convertToBlockMaterial(event.getItem(), blockStateTag);
         if (blockMaterial == null) return;
 
         BlockData blockData = Bukkit.createBlockData(blockMaterial);
         switch (blockMaterial) {
             case RAIL:
-                RedstoneBlockHandler.forcePlaceRail(blockData, event);
+                RedstoneBlockHandler.forcePlaceRail(blockData, blockStateTag, event);
                 break;
 
             case ACTIVATOR_RAIL:
             case DETECTOR_RAIL:
             case POWERED_RAIL:
-                RedstoneBlockHandler.forcePlaceRedstoneRail(blockData, event);
+                RedstoneBlockHandler.forcePlaceRedstoneRail(blockData, blockStateTag, event);
                 break;
 
             case REDSTONE_WIRE:
-                RedstoneBlockHandler.forcePlaceRedstone(blockData, event);
+                RedstoneBlockHandler.forcePlaceRedstone(blockData, blockStateTag, event);
                 break;
 
             case CAKE:
-                GeneralBlockHandler.forcePlaceCake(blockData, event);
+                GeneralBlockHandler.forcePlaceCake(blockData, blockStateTag, event);
                 break;
 
             case SEA_PICKLE:
-                GeneralBlockHandler.forcePlaceSeaPickle(blockData, event);
+                GeneralBlockHandler.forcePlaceSeaPickle(blockData, blockStateTag, event);
                 break;
 
             case SNOW:
-                GeneralBlockHandler.forcePlaceSnow(blockData, event);
+                GeneralBlockHandler.forcePlaceSnow(blockData, blockStateTag, event);
                 break;
 
             case ACACIA_PRESSURE_PLATE:
@@ -143,52 +133,61 @@ public class PlayerInteractListener implements Listener {
             case OAK_PRESSURE_PLATE:
             case SPRUCE_PRESSURE_PLATE:
             case STONE_PRESSURE_PLATE:
-                RedstoneBlockHandler.forcePlacePowerable(blockData, event);
+                RedstoneBlockHandler.forcePlacePowerable(blockData, blockStateTag, event);
                 break;
 
             case HEAVY_WEIGHTED_PRESSURE_PLATE:
             case LIGHT_WEIGHTED_PRESSURE_PLATE:
-                RedstoneBlockHandler.forcePlaceWeightedPressurePlate(blockData, event);
+                RedstoneBlockHandler.forcePlaceWeightedPressurePlate(blockData, blockStateTag, event);
                 break;
 
             case REPEATER:
-                RedstoneBlockHandler.forcePlaceRepeater(blockData, event);
+                RedstoneBlockHandler.forcePlaceRepeater(blockData, blockStateTag, event);
                 break;
 
             case COMPARATOR:
-                RedstoneBlockHandler.forcePlaceComparator(blockData, event);
+                RedstoneBlockHandler.forcePlaceComparator(blockData, blockStateTag, event);
                 break;
 
             case TRIPWIRE_HOOK:
-                RedstoneBlockHandler.forcePlaceTripwireHook(blockData, event);
+                RedstoneBlockHandler.forcePlaceTripwireHook(blockData, blockStateTag, event);
                 break;
 
             case NOTE_BLOCK:
-                NoteBlockHandler.forcePlaceNoteBlock(blockData, event);
+                NoteBlockHandler.forcePlaceNoteBlock(blockData, blockStateTag, event);
                 break;
 
             case STRUCTURE_BLOCK:
                 if (Config.ENABLE_STRUCTURE_BLOCKS) {
-                    GeneralBlockHandler.forcePlaceStructureBlock(blockData, event);
+                    GeneralBlockHandler.forcePlaceStructureBlock(blockData, blockStateTag, event);
                 }
                 break;
 
+            case LADDER:
+            case GRINDSTONE:
+            case BRAIN_CORAL_WALL_FAN:
+            case BUBBLE_CORAL_WALL_FAN:
+            case FIRE_CORAL_WALL_FAN:
+            case HORN_CORAL_WALL_FAN:
+            case TUBE_CORAL_WALL_FAN:
+            case DEAD_BRAIN_CORAL_WALL_FAN:
+            case DEAD_BUBBLE_CORAL_WALL_FAN:
+            case DEAD_FIRE_CORAL_WALL_FAN:
+            case DEAD_HORN_CORAL_WALL_FAN:
+            case DEAD_TUBE_CORAL_WALL_FAN:
+                GeneralBlockHandler.forcePlaceDirectional(blockData, event);
+                break;
+
             default:
+                plantPlaceCheck(blockMaterial, blockData, blockStateTag, event);
         }
     }
 
-    private void plantPlaceCheck(PlayerInteractEvent event) {
-        if (!Config.DISABLE_PLANT_PLACEMENT_RULES ||
-                event.isCancelled() ||
-                event.getItem() == null ||
-                event.getAction() != Action.RIGHT_CLICK_BLOCK) {
+    private void plantPlaceCheck(Material blockMaterial, BlockData blockData, NBTTagCompound blockStateTag, PlayerInteractEvent event) {
+        if (!Config.DISABLE_PLANT_PLACEMENT_RULES) {
             return;
         }
 
-        Material blockMaterial = BlockUtil.convertToBlockMaterial(event.getItem());
-        if (blockMaterial == null) return;
-
-        BlockData blockData = Bukkit.createBlockData(blockMaterial);
         switch (blockMaterial) {
             case GRASS:
             case FERN:
@@ -220,7 +219,8 @@ public class PlayerInteractListener implements Listener {
             case NETHER_WART:
             case CACTUS:
             case SUGAR_CANE:
-                PlantHandler.forcePlaceAgingPlant(blockData, event);
+            case SWEET_BERRIES:
+                PlantHandler.forcePlaceAgingPlant(blockData, blockStateTag, event);
                 break;
 
             case TALL_GRASS:
@@ -229,7 +229,7 @@ public class PlayerInteractListener implements Listener {
             case LILAC:
             case ROSE_BUSH:
             case PEONY:
-                PlantHandler.forcePlaceDoublePlant(blockData, event);
+                PlantHandler.forcePlaceDoublePlant(blockData, blockStateTag, event);
                 break;
 
             case OAK_SAPLING:
@@ -238,7 +238,7 @@ public class PlayerInteractListener implements Listener {
             case JUNGLE_SAPLING:
             case ACACIA_SAPLING:
             case DARK_OAK_SAPLING:
-                PlantHandler.forcePlaceSapling(blockData, event);
+                PlantHandler.forcePlaceSapling(blockData, blockStateTag, event);
                 break;
 
             case CHORUS_PLANT:
@@ -247,7 +247,7 @@ public class PlayerInteractListener implements Listener {
                 break;
 
             case BAMBOO:
-                PlantHandler.forcePlaceBamboo(blockData, event);
+                PlantHandler.forcePlaceBamboo(blockData, blockStateTag, event);
                 break;
 
             default:

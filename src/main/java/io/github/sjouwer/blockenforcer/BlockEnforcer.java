@@ -26,7 +26,6 @@ public class BlockEnforcer extends JavaPlugin {
         config.addDefault("Stop-Door-Updates", true);
         config.addDefault("Stop-Turtle-Egg-Updates", true);
         config.addDefault("Fix_Tool_Desync", true);
-        config.addDefault("WE-Wand", "wooden_axe");
         config.addDefault("Override-NoteBlock-Right-Click", true);
         config.addDefault("Stop-Falling-Blocks", true);
         config.addDefault("Disable-Plant-Placement-Rules", true);

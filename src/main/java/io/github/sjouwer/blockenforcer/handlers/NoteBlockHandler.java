@@ -1,6 +1,5 @@
 package io.github.sjouwer.blockenforcer.handlers;
 
-import io.github.sjouwer.blockenforcer.utils.BlockUtil;
 import io.github.sjouwer.blockenforcer.utils.NoteBlockUtil;
 import net.minecraft.server.v1_14_R1.NBTTagCompound;
 import org.bukkit.Material;
@@ -15,12 +14,11 @@ public class NoteBlockHandler {
     private NoteBlockHandler() {
     }
 
-    public static void forcePlaceNoteBlock(BlockData blockData, PlayerInteractEvent event) {
+    public static void forcePlaceNoteBlock(BlockData blockData, NBTTagCompound blockStateTag, PlayerInteractEvent event) {
         if (!(blockData instanceof NoteBlock)) return;
 
         NoteBlock noteBlock = (NoteBlock) blockData;
 
-        NBTTagCompound blockStateTag = BlockUtil.getBlockStateTag(event.getItem());
         if (blockStateTag != null) {
             String instrument = blockStateTag.getString("instrument").toUpperCase();
             if (!instrument.isEmpty()) noteBlock.setInstrument(NoteBlockUtil.getInstrument(instrument));

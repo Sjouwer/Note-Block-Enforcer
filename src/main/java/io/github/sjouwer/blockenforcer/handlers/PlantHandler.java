@@ -12,18 +12,16 @@ import org.bukkit.block.data.type.Bamboo;
 import org.bukkit.block.data.type.Bamboo.Leaves;
 import org.bukkit.block.data.type.Sapling;
 import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.inventory.ItemStack;
 
 public class PlantHandler {
     private PlantHandler() {
     }
 
-    public static void forcePlaceDoublePlant(BlockData blockData, PlayerInteractEvent event) {
+    public static void forcePlaceDoublePlant(BlockData blockData, NBTTagCompound blockStateTag, PlayerInteractEvent event) {
         if (!(blockData instanceof Bisected)) return;
 
         Bisected plantHalf = (Bisected) blockData;
 
-        NBTTagCompound blockStateTag = BlockUtil.getBlockStateTag(event.getItem());
         if (blockStateTag != null) {
             String half = blockStateTag.getString("half");
             if (!half.isEmpty()) plantHalf.setHalf(stringToHalf(half));
@@ -53,11 +51,15 @@ public class PlantHandler {
         return Bisected.Half.BOTTOM;
     }
 
-    public static void forcePlaceAgingPlant(BlockData blockData, PlayerInteractEvent event) {
-        if (!(blockData instanceof Ageable)) return;
+    public static void forcePlaceAgingPlant(BlockData blockData, NBTTagCompound blockStateTag, PlayerInteractEvent event) {
+        if (!(blockData instanceof Ageable) || event.getItem().getType() == Material.WHEAT) return;
 
         Ageable plant = (Ageable) blockData;
-        plant.setAge(getPlantAge(event.getItem()));
+
+        if (blockStateTag != null){
+            String age = blockStateTag.getString("age");
+            if (!age.isEmpty()) plant.setAge(Integer.parseInt(age));
+        }
 
         Block placedBlock = BlockPlaceHandler.placeBlock(event, plant);
         if (placedBlock == null) return;
@@ -65,26 +67,11 @@ public class PlantHandler {
         event.setCancelled(true);
     }
 
-    private static int getPlantAge(ItemStack stack) {
-        if (stack.getType() == Material.WHEAT) {
-            return 7;
-        }
-
-        NBTTagCompound blockStateTag = BlockUtil.getBlockStateTag(stack);
-        if (blockStateTag != null){
-            String age = blockStateTag.getString("age");
-            if (!age.isEmpty()) return Integer.parseInt(age);
-        }
-
-        return 0;
-    }
-
-    public static void forcePlaceSapling(BlockData blockData, PlayerInteractEvent event) {
+    public static void forcePlaceSapling(BlockData blockData, NBTTagCompound blockStateTag, PlayerInteractEvent event) {
         if (!(blockData instanceof Sapling)) return;
 
         Sapling sapling = (Sapling) blockData;
 
-        NBTTagCompound blockStateTag = BlockUtil.getBlockStateTag(event.getItem());
         if (blockStateTag != null) {
             String stage = blockStateTag.getString("stage");
             if (!stage.isEmpty()) sapling.setStage(Integer.parseInt(stage));
@@ -96,12 +83,11 @@ public class PlantHandler {
         event.setCancelled(true);
     }
 
-    public static void forcePlaceBamboo(BlockData blockData, PlayerInteractEvent event) {
+    public static void forcePlaceBamboo(BlockData blockData, NBTTagCompound blockStateTag, PlayerInteractEvent event) {
         if (!(blockData instanceof Bamboo)) return;
 
         Bamboo bamboo = (Bamboo) blockData;
 
-        NBTTagCompound blockStateTag = BlockUtil.getBlockStateTag(event.getItem());
         if (blockStateTag != null) {
             String age = blockStateTag.getString("age");
             if (!age.isEmpty()) bamboo.setAge(Integer.parseInt(age));

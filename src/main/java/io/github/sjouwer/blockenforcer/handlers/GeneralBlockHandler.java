@@ -1,6 +1,5 @@
 package io.github.sjouwer.blockenforcer.handlers;
 
-import io.github.sjouwer.blockenforcer.utils.BlockUtil;
 import net.minecraft.server.v1_14_R1.NBTTagCompound;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -8,13 +7,19 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.data.BlockData;
+import org.bukkit.block.data.Directional;
 import org.bukkit.block.data.type.*;
-import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 
 public class GeneralBlockHandler {
     private GeneralBlockHandler() {
+    }
+
+    public static void breakBlockWithoutUpdates(Block block) {
+        block.setBlockData(Bukkit.createBlockData(Material.AIR), false);
+        block.getState().update(true, false);
+        RedstoneBlockHandler.updateRedstone(block, true);
     }
 
     public static void forcePlaceBlock(BlockData blockData, PlayerInteractEvent event) {
@@ -24,12 +29,27 @@ public class GeneralBlockHandler {
         event.setCancelled(true);
     }
 
-    public static void forcePlaceCake(BlockData blockData, PlayerInteractEvent event) {
+    public static void forcePlaceDirectional(BlockData blockData, PlayerInteractEvent event) {
+        if (!(blockData instanceof Directional)) return;
+
+        Directional directional = (Directional) blockData;
+        BlockFace facing = event.getBlockFace();
+        if (facing == BlockFace.UP || facing == BlockFace.DOWN) {
+            facing = event.getPlayer().getFacing().getOppositeFace();
+        }
+        directional.setFacing(facing);
+
+        Block placedBlock = BlockPlaceHandler.placeBlock(event, directional);
+        if (placedBlock == null) return;
+
+        event.setCancelled(true);
+    }
+
+    public static void forcePlaceCake(BlockData blockData, NBTTagCompound blockStateTag, PlayerInteractEvent event) {
         if (!(blockData instanceof Cake)) return;
 
         Cake cake = (Cake) blockData;
 
-        NBTTagCompound blockStateTag = BlockUtil.getBlockStateTag(event.getItem());
         if (blockStateTag != null) {
             String bites = blockStateTag.getString("bites");
             if (!bites.isEmpty()) cake.setBites(Integer.parseInt(bites));
@@ -41,12 +61,11 @@ public class GeneralBlockHandler {
         event.setCancelled(true);
     }
 
-    public static void forcePlaceSeaPickle(BlockData blockData, PlayerInteractEvent event) {
+    public static void forcePlaceSeaPickle(BlockData blockData, NBTTagCompound blockStateTag, PlayerInteractEvent event) {
         if (!(blockData instanceof SeaPickle)) return;
 
         SeaPickle pickle = (SeaPickle) blockData;
 
-        NBTTagCompound blockStateTag = BlockUtil.getBlockStateTag(event.getItem());
         if (blockStateTag != null) {
             String pickles = blockStateTag.getString("pickles");
             if (!pickles.isEmpty()) pickle.setPickles(Integer.parseInt(pickles));
@@ -61,12 +80,11 @@ public class GeneralBlockHandler {
         event.setCancelled(true);
     }
 
-    public static void forcePlaceStructureBlock(BlockData blockData, PlayerInteractEvent event) {
+    public static void forcePlaceStructureBlock(BlockData blockData, NBTTagCompound blockStateTag, PlayerInteractEvent event) {
         if (!(blockData instanceof StructureBlock)) return;
 
         StructureBlock structureBlock = (StructureBlock) blockData;
 
-        NBTTagCompound blockStateTag = BlockUtil.getBlockStateTag(event.getItem());
         if (blockStateTag != null) {
             String mode = blockStateTag.getString("mode").toUpperCase();
             if (!mode.isEmpty()) structureBlock.setMode(StructureBlock.Mode.valueOf(mode));
@@ -78,10 +96,9 @@ public class GeneralBlockHandler {
         event.setCancelled(true);
     }
 
-    public static void forcePlaceSnow(BlockData blockData, PlayerInteractEvent event) {
+    public static void forcePlaceSnow(BlockData blockData, NBTTagCompound blockStateTag, PlayerInteractEvent event) {
         if (!(blockData instanceof Snow)) return;
 
-        NBTTagCompound blockStateTag = BlockUtil.getBlockStateTag(event.getItem());
         if (blockStateTag == null) {
             boolean layerAdded = false;
 
@@ -129,11 +146,5 @@ public class GeneralBlockHandler {
         }
 
         return false;
-    }
-
-    public static void breakBlockWithoutUpdates(Block block) {
-        block.setBlockData(Bukkit.createBlockData(Material.AIR), false);
-        block.getState().update(true, false);
-        RedstoneBlockHandler.updateRedstone(block, true);
     }
 }

@@ -6,6 +6,7 @@ import net.minecraft.server.v1_14_R1.BlockPosition;
 import net.minecraft.server.v1_14_R1.IBlockData;
 import net.minecraft.server.v1_14_R1.NBTTagCompound;
 import org.bukkit.Material;
+import org.bukkit.Tag;
 import org.bukkit.block.Block;
 import org.bukkit.craftbukkit.v1_14_R1.CraftWorld;
 import org.bukkit.craftbukkit.v1_14_R1.inventory.CraftItemStack;
@@ -35,8 +36,11 @@ public class BlockUtil {
         materialBiMap.put(Material.COCOA, Material.COCOA_BEANS);
         materialBiMap.put(Material.CARROTS, Material.CARROT);
         materialBiMap.put(Material.POTATOES, Material.POTATO);
+        materialBiMap.put(Material.SWEET_BERRY_BUSH, Material.SWEET_BERRIES);
         materialBiMap.put(Material.REDSTONE_WIRE, Material.REDSTONE);
         materialBiMap.put(Material.TRIPWIRE, Material.STRING);
+        materialBiMap.put(Material.WATER, Material.WATER_BUCKET);
+        materialBiMap.put(Material.LAVA, Material.LAVA_BUCKET);
     }
 
     private BlockUtil() {
@@ -66,14 +70,14 @@ public class BlockUtil {
         ItemStack stack;
         Material blockMaterial = block.getType();
 
-        if (blockMaterial.isItem()) {
-            stack = new ItemStack(blockMaterial);
-            return stack;
-        }
-
         Material itemMaterial = materialBiMap.getOrDefault(blockMaterial, null);
         if (itemMaterial != null) {
             stack = new ItemStack(itemMaterial);
+            return stack;
+        }
+
+        if (blockMaterial.isItem()) {
+            stack = new ItemStack(blockMaterial);
             return stack;
         }
 
@@ -82,13 +86,24 @@ public class BlockUtil {
         return stack;
     }
 
-    public static Material convertToBlockMaterial(ItemStack stack) {
+    public static Material convertToBlockMaterial(ItemStack stack, NBTTagCompound blockStateTag) {
         Material material = stack.getType();
-        if (material.isBlock()) {
-            return material;
-        }
+        String facing = blockStateTag == null ? "" : blockStateTag.getString("facing");
 
-        return materialBiMap.inverse().getOrDefault(material, null);
+        //Coral behaviour is Cubed specific
+        switch (material) {
+            case BRAIN_CORAL_FAN: return Material.BRAIN_CORAL_WALL_FAN;
+            case BUBBLE_CORAL_FAN: return facing.isEmpty() ? material : Material.BUBBLE_CORAL_WALL_FAN;
+            case FIRE_CORAL_FAN: return Material.FIRE_CORAL_WALL_FAN;
+            case HORN_CORAL_FAN: return Material.HORN_CORAL_WALL_FAN;
+            case TUBE_CORAL_FAN: return Material.TUBE_CORAL_WALL_FAN;
+            case DEAD_BRAIN_CORAL_FAN: return Material.DEAD_BRAIN_CORAL_WALL_FAN;
+            case DEAD_BUBBLE_CORAL_FAN: return Material.DEAD_BUBBLE_CORAL_WALL_FAN;
+            case DEAD_FIRE_CORAL_FAN: return Material.DEAD_FIRE_CORAL_WALL_FAN;
+            case DEAD_HORN_CORAL_FAN: return facing.isEmpty() ? material : Material.DEAD_HORN_CORAL_WALL_FAN;
+            case DEAD_TUBE_CORAL_FAN: return Material.DEAD_TUBE_CORAL_WALL_FAN;
+            default: return material.isBlock() ? material : materialBiMap.inverse().getOrDefault(material, null);
+        }
     }
 
     public static boolean isReplaceable(Block block) {
@@ -110,5 +125,15 @@ public class BlockUtil {
             default:
                 return false;
         }
+    }
+
+    public static boolean isInteractable(Block block) {
+        Material type = block.getType();
+        return type.isInteractable() &&
+                type != Material.NOTE_BLOCK &&
+                type != Material.CAKE &&
+                type != Material.STRUCTURE_BLOCK &&
+                !Tag.FENCES.isTagged(type) &&
+                !Tag.STAIRS.isTagged(type);
     }
 }
