@@ -354,7 +354,7 @@ public class RedstoneBlockHandler {
 
         BlockFace facing = event.getBlockFace();
         if (facing == BlockFace.UP || facing == BlockFace.DOWN) {
-            facing = event.getPlayer().getFacing().getOppositeFace();
+            facing = event.getPlayer().getFacing();
         }
         door.setFacing(facing);
         door.setHalf(Bisected.Half.BOTTOM);

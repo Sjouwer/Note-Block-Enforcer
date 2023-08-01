@@ -83,7 +83,7 @@ public class PlayerInteractListener implements Listener {
 
         event.setCancelled(true);
 
-        if (event.getItem() == null) return;
+        if (event.getItem() == null || !BlockUtil.isReplaceable(event.getClickedBlock().getRelative(event.getBlockFace()))) return;
         BlockPlaceHandler.forcePlayerToPlaceBlock(event.getPlayer(), event.getItem(), event.getClickedBlock().getRelative(event.getBlockFace()), event.getHand());
     }
 
