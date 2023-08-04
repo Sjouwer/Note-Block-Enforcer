@@ -25,12 +25,12 @@ public class BlockEnforcer extends JavaPlugin {
         config.addDefault("Max-Redstone-Updates-Per-Tick", 100);
         config.addDefault("Stop-Door-Updates", true);
         config.addDefault("Stop-Turtle-Egg-Updates", true);
-        config.addDefault("Fix_Tool_Desync", true);
+        config.addDefault("Fix-Tool-Desync", true);
         config.addDefault("Override-NoteBlock-Right-Click", true);
         config.addDefault("Stop-Falling-Blocks", true);
         config.addDefault("Disable-Plant-Placement-Rules", true);
-        config.addDefault("Enable_Structure_Blocks", true);
-        config.addDefault("Disable_Piston_Movement", true);
+        config.addDefault("Enable-Structure-Blocks", true);
+        config.addDefault("Disable-Piston-Movement", true);
         config.options().copyDefaults(true);
         saveConfig();
 

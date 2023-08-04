@@ -14,9 +14,9 @@ public class Config {
     public static final boolean DISABLE_PLANT_PLACEMENT_RULES = BlockEnforcer.getPlugin().getConfig().getBoolean("Disable-Plant-Placement-Rules");
     public static final boolean STOP_TURTLE_EGG_UPDATES = BlockEnforcer.getPlugin().getConfig().getBoolean("Stop-Turtle-Egg-Updates");
     public static final boolean OVERRIDE_NOTE_BLOCK_CLICK = BlockEnforcer.getPlugin().getConfig().getBoolean("Override-NoteBlock-Right-Click");
-    public static final boolean FIX_TOOL_DESYNC = BlockEnforcer.getPlugin().getConfig().getBoolean("Fix_Tool_Desync");
-    public static final boolean ENABLE_STRUCTURE_BLOCKS = BlockEnforcer.getPlugin().getConfig().getBoolean("Enable_Structure_Blocks");
-    public static final boolean DISABLE_PISTON_MOVEMENT = BlockEnforcer.getPlugin().getConfig().getBoolean("Disable_Piston_Movement");
+    public static final boolean FIX_TOOL_DESYNC = BlockEnforcer.getPlugin().getConfig().getBoolean("Fix-Tool-Desync");
+    public static final boolean ENABLE_STRUCTURE_BLOCKS = BlockEnforcer.getPlugin().getConfig().getBoolean("Enable-Structure-Blocks");
+    public static final boolean DISABLE_PISTON_MOVEMENT = BlockEnforcer.getPlugin().getConfig().getBoolean("Disable-Piston-Movement");
 
     private static Material pickerTool = Material.BONE;
 

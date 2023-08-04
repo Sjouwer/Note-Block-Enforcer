@@ -73,7 +73,7 @@ public class BlockPlaceHandler {
         EntityPlayer human = ((CraftPlayer) player).getHandle();
         EnumHand hand = slot == EquipmentSlot.OFF_HAND ? EnumHand.OFF_HAND : EnumHand.MAIN_HAND;
         net.minecraft.server.v1_14_R1.ItemStack nmsItem = CraftItemStack.asNMSCopy(item);
-        MovingObjectPositionBlock mopb = (MovingObjectPositionBlock) genMOPB(player, block);
+        MovingObjectPositionBlock mopb = genMOPB(player, block);
 
         nmsItem.placeItem(new ItemActionContext(human, hand, mopb), hand);
 
@@ -82,7 +82,7 @@ public class BlockPlaceHandler {
         }
     }
 
-    private static Object genMOPB(Player player, Block block) {
+    private static MovingObjectPositionBlock genMOPB(Player player, Block block) {
         Location source = player.getEyeLocation();
         EntityHuman human = ((CraftPlayer) player).getHandle();
         return new MovingObjectPositionBlock(
