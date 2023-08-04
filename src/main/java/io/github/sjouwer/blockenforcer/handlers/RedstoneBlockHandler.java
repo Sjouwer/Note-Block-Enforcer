@@ -216,14 +216,87 @@ public class RedstoneBlockHandler {
         AnaloguePowerable plate = (AnaloguePowerable) blockData;
 
         if (blockStateTag != null) {
+            BlockFace facing = event.getBlockFace();
+            if (facing == BlockFace.UP || facing == BlockFace.DOWN) {
+                facing = event.getPlayer().getFacing().getOppositeFace();
+            }
+
             String power = blockStateTag.getString("power");
-            if (!power.isEmpty()) plate.setPower(Integer.parseInt(power));
+            int powerLvl = power.isEmpty() ? 0 : Integer.parseInt(power);
+
+            //The rotation of the pressure plate models depends on the power lvl in the Cubed pack
+            powerLvl = blockData.getMaterial() == Material.LIGHT_WEIGHTED_PRESSURE_PLATE ?
+                    getLightPressurePlateRotation(facing, powerLvl) :
+                    getHeavyPressurePlateRotation(facing, powerLvl);
+
+            plate.setPower(powerLvl);
         }
 
         Block placedBlock = BlockPlaceHandler.placeBlock(event, plate);
         if (placedBlock == null) return;
 
         event.setCancelled(true);
+    }
+
+    public static int getLightPressurePlateRotation(BlockFace facing, int powerLvl) {
+        if (powerLvl > 0 && powerLvl < 5) {
+            switch (facing) {
+                case WEST: return 2;
+                case SOUTH: return 1;
+                case EAST: return 4;
+                default: return 3;
+            }
+        }
+
+        if (powerLvl > 4 && powerLvl < 9) {
+            switch (facing) {
+                case WEST: return 6;
+                case SOUTH: return 7;
+                case EAST: return 8;
+                default: return 5;
+            }
+        }
+
+        if (powerLvl > 8 && powerLvl < 13) {
+            switch (facing) {
+                case WEST: return 10;
+                case SOUTH: return 11;
+                case EAST: return 12;
+                default: return 9;
+            }
+        }
+
+        if (powerLvl > 12 && powerLvl < 15) {
+            switch (facing) {
+                case WEST:
+                case EAST: return 14;
+                default: return 13;
+            }
+        }
+
+        return powerLvl;
+    }
+
+    public static int getHeavyPressurePlateRotation(BlockFace facing, int powerLvl) {
+        if (powerLvl > 0 && powerLvl < 5) {
+            switch (facing) {
+                case WEST: return 2;
+                case SOUTH: return 3;
+                case EAST: return 4;
+                default: return 1;
+            }
+        }
+
+        if (powerLvl > 4 && powerLvl < 9) {
+            switch (facing) {
+                case WEST: return 6;
+                case SOUTH: return 7;
+                case EAST: return 8;
+                default: return 5;
+            }
+        }
+
+        return powerLvl;
     }
 
     public static void forcePlaceRepeater(BlockData blockData, NBTTagCompound blockStateTag, PlayerInteractEvent event) {
@@ -259,18 +332,24 @@ public class RedstoneBlockHandler {
 
         Comparator comparator = (Comparator) blockData;
 
+        BlockFace facing = event.getBlockFace();
+        if (facing == BlockFace.UP || facing == BlockFace.DOWN) {
+            facing = event.getPlayer().getFacing().getOppositeFace();
+        }
+
         if (blockStateTag != null) {
             String powered = blockStateTag.getString("powered");
             if (!powered.isEmpty()) comparator.setPowered(Boolean.parseBoolean(powered));
 
             String mode = blockStateTag.getString("mode").toUpperCase();
             if (!mode.isEmpty()) comparator.setMode(Comparator.Mode.valueOf(mode));
+
+            //This is the park bench in the Cubed pack, which is rotated 180, needs to be corrected
+            if (!comparator.isPowered() && comparator.getMode() == Comparator.Mode.SUBTRACT) {
+                facing = facing.getOppositeFace();
+            }
         }
 
-        BlockFace facing = event.getBlockFace();
-        if (facing == BlockFace.UP || facing == BlockFace.DOWN) {
-            facing = event.getPlayer().getFacing().getOppositeFace();
-        }
         comparator.setFacing(facing);
 
         Block placedBlock = BlockPlaceHandler.placeBlock(event, comparator);
