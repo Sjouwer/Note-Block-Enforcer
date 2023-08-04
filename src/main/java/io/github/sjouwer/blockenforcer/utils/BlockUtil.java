@@ -8,6 +8,8 @@ import net.minecraft.server.v1_14_R1.NBTTagCompound;
 import org.bukkit.Material;
 import org.bukkit.Tag;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
+import org.bukkit.block.data.type.Switch;
 import org.bukkit.craftbukkit.v1_14_R1.CraftWorld;
 import org.bukkit.craftbukkit.v1_14_R1.inventory.CraftItemStack;
 import org.bukkit.inventory.ItemStack;
@@ -136,5 +138,37 @@ public class BlockUtil {
                 type != Material.CAULDRON &&
                 !Tag.FENCES.isTagged(type) &&
                 !Tag.STAIRS.isTagged(type);
+    }
+
+    public static BlockFace rotateClock(BlockFace face) {
+        switch (face) {
+            case NORTH: return BlockFace.EAST;
+            case EAST: return BlockFace.SOUTH;
+            case SOUTH: return BlockFace.WEST;
+            default: return BlockFace.NORTH;
+        }
+    }
+
+    public static BlockFace rotateAntiClock(BlockFace face) {
+        switch (face) {
+            case NORTH: return BlockFace.WEST;
+            case WEST: return BlockFace.SOUTH;
+            case SOUTH: return BlockFace.EAST;
+            default: return BlockFace.NORTH;
+        }
+    }
+
+    public static Switch.Face getSwitchFace(BlockFace face) {
+        switch (face) {
+            case NORTH:
+            case EAST:
+            case SOUTH:
+            case WEST:
+                return Switch.Face.WALL;
+            case DOWN:
+                return Switch.Face.CEILING;
+            default:
+                return Switch.Face.FLOOR;
+        }
     }
 }

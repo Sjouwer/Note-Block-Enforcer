@@ -449,4 +449,40 @@ public class RedstoneBlockHandler {
             BlockPlaceHandler.placeBlock(event, door, doorTopBlock);
         }
     }
+
+    public static void forcePlaceButton(BlockData blockData, NBTTagCompound blockStateTag, PlayerInteractEvent event) {
+        if (!(blockData instanceof Switch)) return;
+
+        Switch button = (Switch) blockData;
+
+        BlockFace facing = event.getBlockFace();
+        Switch.Face switchFace = BlockUtil.getSwitchFace(facing);
+        button.setFace(switchFace);
+
+        if (blockStateTag != null) {
+            String powered = blockStateTag.getString("powered");
+            if (!powered.isEmpty()) button.setPowered(Boolean.parseBoolean(powered));
+
+            //(Dark Oak Button) Cubed pack uses a keyboard for floor & ceiling and a monitor for the wall
+            if (button.isPowered() && blockData.getMaterial() == Material.DARK_OAK_BUTTON) {
+                String face = blockStateTag.getString("face").toUpperCase();
+                if (!face.isEmpty()) button.setFace(Switch.Face.valueOf(face));
+            }
+        }
+
+        if (facing == BlockFace.UP || facing == BlockFace.DOWN) {
+            //(Acacia Button) Cubed pack uses a mouse, rotate to make it face the right way
+            if (button.isPowered() && blockData.getMaterial() == Material.ACACIA_BUTTON) {
+                facing = BlockUtil.rotateClock(event.getPlayer().getFacing());
+            } else {
+                facing = event.getPlayer().getFacing().getOppositeFace();
+            }
+        }
+        button.setFacing(facing);
+
+        Block placedBlock = BlockPlaceHandler.placeBlock(event, button);
+        if (placedBlock == null) return;
+
+        event.setCancelled(true);
+    }
 }

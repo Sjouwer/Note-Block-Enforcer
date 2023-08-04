@@ -195,6 +195,16 @@ public class PlayerInteractListener implements Listener {
                 GeneralBlockHandler.forcePlaceCauldron(blockData, event);
                 break;
 
+            case STONE_BUTTON:
+            case ACACIA_BUTTON:
+            case BIRCH_BUTTON:
+            case DARK_OAK_BUTTON:
+            case JUNGLE_BUTTON:
+            case OAK_BUTTON:
+            case SPRUCE_BUTTON:
+                RedstoneBlockHandler.forcePlaceButton(blockData, blockStateTag, event);
+                break;
+
             default:
                 plantPlaceCheck(blockMaterial, blockData, blockStateTag, event);
         }
