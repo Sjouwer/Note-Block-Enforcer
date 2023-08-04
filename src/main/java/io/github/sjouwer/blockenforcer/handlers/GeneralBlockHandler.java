@@ -8,6 +8,7 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.block.data.Directional;
+import org.bukkit.block.data.Levelled;
 import org.bukkit.block.data.type.*;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
@@ -43,6 +44,10 @@ public class GeneralBlockHandler {
         if (placedBlock == null) return;
 
         event.setCancelled(true);
+    }
+
+    public static void forcePlaceGrindstone(BlockData blockData, NBTTagCompound blockStateTag, PlayerInteractEvent event) {
+        //Grindstone is missing a Face class, need to use NMS to implement it
     }
 
     public static void forcePlaceCake(BlockData blockData, NBTTagCompound blockStateTag, PlayerInteractEvent event) {
@@ -91,6 +96,37 @@ public class GeneralBlockHandler {
         }
 
         Block placedBlock = BlockPlaceHandler.placeBlock(event, structureBlock);
+        if (placedBlock == null) return;
+
+        event.setCancelled(true);
+    }
+
+    public static void forcePlaceCauldron(BlockData blockData, PlayerInteractEvent event) {
+        if (!(blockData instanceof Levelled)) return;
+
+        Levelled cauldron = (Levelled) blockData;
+
+        BlockFace facing = event.getBlockFace();
+        if (facing == BlockFace.UP || facing == BlockFace.DOWN) {
+            facing = event.getPlayer().getFacing().getOppositeFace();
+        }
+
+        //In the Cubed pack the rotation of the cauldron model is done using the water lvl
+        switch (facing) {
+            case WEST:
+                cauldron.setLevel(3);
+                break;
+            case SOUTH:
+                cauldron.setLevel(2);
+                break;
+            case EAST:
+                cauldron.setLevel(1);
+                break;
+            default:
+                cauldron.setLevel(0);
+        }
+
+        Block placedBlock = BlockPlaceHandler.placeBlock(event, cauldron);
         if (placedBlock == null) return;
 
         event.setCancelled(true);

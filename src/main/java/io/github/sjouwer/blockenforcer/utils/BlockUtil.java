@@ -133,6 +133,7 @@ public class BlockUtil {
                 type != Material.NOTE_BLOCK &&
                 type != Material.CAKE &&
                 type != Material.STRUCTURE_BLOCK &&
+                type != Material.CAULDRON &&
                 !Tag.FENCES.isTagged(type) &&
                 !Tag.STAIRS.isTagged(type);
     }

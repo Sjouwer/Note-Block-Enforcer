@@ -174,7 +174,6 @@ public class PlayerInteractListener implements Listener {
                 break;
 
             case LADDER:
-            case GRINDSTONE:
             case BRAIN_CORAL_WALL_FAN:
             case BUBBLE_CORAL_WALL_FAN:
             case FIRE_CORAL_WALL_FAN:
@@ -186,6 +185,14 @@ public class PlayerInteractListener implements Listener {
             case DEAD_HORN_CORAL_WALL_FAN:
             case DEAD_TUBE_CORAL_WALL_FAN:
                 GeneralBlockHandler.forcePlaceDirectional(blockData, event);
+                break;
+
+            case GRINDSTONE:
+                GeneralBlockHandler.forcePlaceGrindstone(blockData, blockStateTag, event);
+                break;
+
+            case CAULDRON:
+                GeneralBlockHandler.forcePlaceCauldron(blockData, event);
                 break;
 
             default:
