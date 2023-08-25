@@ -20,7 +20,7 @@ public class GeneralBlockHandler {
     public static void breakBlockWithoutUpdates(Block block) {
         block.setBlockData(Bukkit.createBlockData(Material.AIR), false);
         block.getState().update(true, false);
-        RedstoneBlockHandler.updateRedstone(block, true);
+        UpdateHandler.updateRedstone(block, true);
     }
 
     public static void forcePlaceBlock(BlockData blockData, PlayerInteractEvent event) {
@@ -47,7 +47,15 @@ public class GeneralBlockHandler {
     }
 
     public static void forcePlaceGrindstone(BlockData blockData, NBTTagCompound blockStateTag, PlayerInteractEvent event) {
-        //Grindstone is missing a Face class, need to use NMS to implement it
+        if (blockData.getMaterial() != Material.GRINDSTONE || blockStateTag == null) return;
+
+        String face = blockStateTag.getString("face").toUpperCase();
+        if (!face.equals("WALL")) return;
+
+        // Grindstone is missing a Face implementation
+        // When placing one down with BlockPlaceHandler it'll always use the wall face
+        // This is the best that can be done without using NMS
+        forcePlaceDirectional(blockData, event);
     }
 
     public static void forcePlaceCake(BlockData blockData, NBTTagCompound blockStateTag, PlayerInteractEvent event) {

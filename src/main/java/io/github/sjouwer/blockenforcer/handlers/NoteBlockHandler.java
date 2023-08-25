@@ -36,10 +36,11 @@ public class NoteBlockHandler {
         event.setCancelled(true);
     }
 
-    public static void updateAllAboveNoteBlocks(Block blockAbove) {
-        while (blockAbove.getType() == Material.NOTE_BLOCK) {
-            blockAbove.getState().update(true, false);
-            blockAbove = blockAbove.getRelative(BlockFace.UP, 1);
+    public static void updateAllAboveNoteBlocks(Block block) {
+        block = block.getRelative(BlockFace.UP, 1);
+        while (block.getType() == Material.NOTE_BLOCK) {
+            block.getState().update(true, false);
+            block = block.getRelative(BlockFace.UP, 1);
         }
     }
 }

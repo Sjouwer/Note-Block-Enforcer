@@ -6,6 +6,7 @@ import org.bukkit.block.Block;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 public class BlockPlaceListener implements Listener {
@@ -13,19 +14,20 @@ public class BlockPlaceListener implements Listener {
     @EventHandler
     public void onBlockPlaceEvent(BlockPlaceEvent event) {
         Block placedBlock = event.getBlockPlaced();
+        ItemStack handItem = event.getItemInHand();
 
         switch (placedBlock.getType()) {
             case FLOWER_POT:
-                TechnicalBlockHandler.placePottedPlant(event.getItemInHand(), placedBlock);
+                TechnicalBlockHandler.placePottedPlant(handItem, placedBlock);
                 break;
 
             case ICE:
-                TechnicalBlockHandler.placeFrostedIce(event.getItemInHand(), placedBlock);
+                TechnicalBlockHandler.placeFrostedIce(handItem, placedBlock);
                 break;
 
             case PISTON:
             case STICKY_PISTON:
-                TechnicalBlockHandler.placePistonHead(event.getItemInHand(), placedBlock);
+                TechnicalBlockHandler.placePistonHead(handItem, placedBlock);
                 break;
 
             default:

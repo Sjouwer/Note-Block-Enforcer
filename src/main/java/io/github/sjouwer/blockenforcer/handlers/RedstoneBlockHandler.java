@@ -1,10 +1,7 @@
 package io.github.sjouwer.blockenforcer.handlers;
 
-import io.github.sjouwer.blockenforcer.BlockEnforcer;
-import io.github.sjouwer.blockenforcer.Config;
 import io.github.sjouwer.blockenforcer.utils.BlockUtil;
 import net.minecraft.server.v1_14_R1.NBTTagCompound;
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
@@ -12,158 +9,8 @@ import org.bukkit.block.data.*;
 import org.bukkit.block.data.type.*;
 import org.bukkit.event.player.PlayerInteractEvent;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 public class RedstoneBlockHandler {
-    private static final Map<Block, BlockData> BlocksToChange = new HashMap<>();
-    private static final List<Block> updatedRedstone = new ArrayList<>();
-    private static final List<Block> redstoneToUpdate = new ArrayList<>();
-    private static int currentUpdateCount = 0;
-
     private RedstoneBlockHandler() {
-    }
-
-    private static void scheduleBlockChangeUpdate(Block blockToChange, Material material) {
-        if ((material != null && blockToChange.getType() != material) || BlocksToChange.containsKey(blockToChange)) {
-            return;
-        }
-
-        BlocksToChange.put(blockToChange, blockToChange.getBlockData().clone());
-
-        if (BlocksToChange.size() == 1) {
-            Bukkit.getScheduler().runTaskLater(BlockEnforcer.getPlugin(), () -> {
-
-                BlocksToChange.forEach((block, data) -> {
-                    if (block.getType() == data.getMaterial()) {
-                        block.setBlockData(data, false);
-                        block.getState().update(true, false);
-                        if (material == Material.REDSTONE_WIRE) {
-                            updatedRedstone.add(block);
-                            updateRedstone(block);
-                        }
-                    }
-                });
-
-                BlocksToChange.clear();
-            }, 1L);
-        }
-    }
-
-    private static void scheduleRedstoneUpdate(Block blockToUpdate) {
-        if (blockToUpdate.getType() != Material.REDSTONE_WIRE || updatedRedstone.contains(blockToUpdate) || redstoneToUpdate.contains(blockToUpdate)) {
-            return;
-        }
-
-        redstoneToUpdate.add(blockToUpdate);
-
-        if (redstoneToUpdate.size() == 1) {
-            Bukkit.getScheduler().runTaskLater(BlockEnforcer.getPlugin(), () -> {
-                currentUpdateCount = 0;
-                List<Block> blocks = new ArrayList<>(redstoneToUpdate);
-                redstoneToUpdate.clear();
-                for (Block block : blocks) {
-                    updateRedstoneNow(block);
-                }
-            }, 1L);
-        }
-    }
-
-    private static void updateRedstoneNow(Block block) {
-        if (block.getType() != Material.REDSTONE_WIRE || updatedRedstone.contains(block) || redstoneToUpdate.contains(block)) {
-            return;
-        }
-
-        if (currentUpdateCount < Config.MAX_REDSTONE_UPDATES) {
-            currentUpdateCount++;
-            block.getState().update(true, false);
-            updatedRedstone.add(block);
-            updateRedstone(block);
-        }
-        else {
-            scheduleRedstoneUpdate(block);
-        }
-    }
-
-    public static void stopRedstoneChange(Block block) {
-        updatedRedstone.clear();
-        stopRedstoneChangeAround(block);
-        scheduleBlockChangeUpdate(block.getRelative(BlockFace.DOWN), Material.REDSTONE_WIRE);
-        stopRedstoneChangeAround(block.getRelative(BlockFace.DOWN));
-        scheduleBlockChangeUpdate(block.getRelative(BlockFace.UP), Material.REDSTONE_WIRE);
-        stopRedstoneChangeAround(block.getRelative(BlockFace.UP));
-    }
-
-    private static void stopRedstoneChangeAround(Block block) {
-        scheduleBlockChangeUpdate(block.getRelative(BlockFace.NORTH), Material.REDSTONE_WIRE);
-        scheduleBlockChangeUpdate(block.getRelative(BlockFace.EAST), Material.REDSTONE_WIRE);
-        scheduleBlockChangeUpdate(block.getRelative(BlockFace.SOUTH), Material.REDSTONE_WIRE);
-        scheduleBlockChangeUpdate(block.getRelative(BlockFace.WEST), Material.REDSTONE_WIRE);
-    }
-
-    public static void updateRedstone(Block block, boolean resetUpdates) {
-        if (resetUpdates) {
-            updatedRedstone.clear();
-        }
-        updateRedstone(block);
-    }
-
-    public static void updateRedstone(Block block) {
-        updateRedstoneAround(block);
-        updateRedstoneNow(block.getRelative(BlockFace.DOWN));
-        updateRedstoneAround(block.getRelative(BlockFace.DOWN));
-        updateRedstoneNow(block.getRelative(BlockFace.UP));
-        updateRedstoneAround(block.getRelative(BlockFace.UP));
-    }
-
-    private static void updateRedstoneAround(Block block) {
-        updateRedstoneNow(block.getRelative(BlockFace.NORTH));
-        updateRedstoneNow(block.getRelative(BlockFace.EAST));
-        updateRedstoneNow(block.getRelative(BlockFace.SOUTH));
-        updateRedstoneNow(block.getRelative(BlockFace.WEST));
-    }
-
-    public static void stopTripwireChange(Block block) {
-        scheduleBlockChangeUpdate(block.getRelative(BlockFace.NORTH), Material.TRIPWIRE);
-        scheduleBlockChangeUpdate(block.getRelative(BlockFace.EAST), Material.TRIPWIRE);
-        scheduleBlockChangeUpdate(block.getRelative(BlockFace.SOUTH), Material.TRIPWIRE);
-        scheduleBlockChangeUpdate(block.getRelative(BlockFace.WEST), Material.TRIPWIRE);
-    }
-
-    public static void stopGateChange(Block block) {
-        Block relativeBlock = block.getRelative(BlockFace.NORTH);
-        if (relativeBlock.getBlockData() instanceof Gate) scheduleBlockChangeUpdate(relativeBlock, null);
-        relativeBlock = block.getRelative(BlockFace.EAST);
-        if (relativeBlock.getBlockData() instanceof Gate) scheduleBlockChangeUpdate(relativeBlock, null);
-        relativeBlock = block.getRelative(BlockFace.SOUTH);
-        if (relativeBlock.getBlockData() instanceof Gate) scheduleBlockChangeUpdate(relativeBlock, null);
-        relativeBlock = block.getRelative(BlockFace.WEST);
-        if (relativeBlock.getBlockData() instanceof Gate) scheduleBlockChangeUpdate(relativeBlock, null);
-    }
-
-    public static void openDoorWithoutOtherChanges(Block block) {
-        Door door = (Door) block.getBlockData();
-        door.setOpen(!door.isOpen());
-        block.setBlockData(door);
-        block.getState().update(true, false);
-
-        boolean isTop = door.getHalf() == Bisected.Half.TOP;
-        Block relatedBlock = block.getRelative(isTop ? BlockFace.DOWN : BlockFace.UP);
-        if (relatedBlock.getType() != door.getMaterial()) {
-            return;
-        }
-
-        Door relatedDoor = (Door) relatedBlock.getBlockData();
-        if ((isTop && relatedDoor.getHalf() == Bisected.Half.TOP) ||
-                (!isTop && relatedDoor.getHalf() == Bisected.Half.BOTTOM)) {
-            return;
-        }
-
-        relatedDoor.setOpen(door.isOpen());
-        relatedBlock.setBlockData(relatedDoor);
-        relatedBlock.getState().update(true, false);
     }
 
     public static void forcePlaceRedstone(BlockData blockData, NBTTagCompound blockStateTag, PlayerInteractEvent event) {
@@ -416,38 +263,6 @@ public class RedstoneBlockHandler {
         if (placedBlock == null) return;
 
         event.setCancelled(true);
-    }
-
-    public static void forcePlaceDoor(BlockData blockData, NBTTagCompound blockStateTag, PlayerInteractEvent event) {
-        if (!(blockData instanceof Door)) return;
-
-        Door door = (Door) blockData;
-
-        if (blockStateTag != null) {
-            String hinge = blockStateTag.getString("hinge").toUpperCase();
-            if (!hinge.isEmpty()) door.setHinge(Door.Hinge.valueOf(hinge));
-
-            String powered = blockStateTag.getString("powered");
-            if (!powered.isEmpty()) door.setPowered(Boolean.parseBoolean(powered));
-        }
-
-        BlockFace facing = event.getBlockFace();
-        if (facing == BlockFace.UP || facing == BlockFace.DOWN) {
-            facing = event.getPlayer().getFacing();
-        }
-        door.setFacing(facing);
-        door.setHalf(Bisected.Half.BOTTOM);
-
-        Block placedBlock = BlockPlaceHandler.placeBlock(event, door);
-        if (placedBlock == null) return;
-
-        event.setCancelled(true);
-
-        Block doorTopBlock = placedBlock.getRelative(BlockFace.UP, 1);
-        if (BlockUtil.isReplaceable(doorTopBlock)) {
-            door.setHalf(Bisected.Half.TOP);
-            BlockPlaceHandler.placeBlock(event, door, doorTopBlock);
-        }
     }
 
     public static void forcePlaceButton(BlockData blockData, NBTTagCompound blockStateTag, PlayerInteractEvent event) {

@@ -18,28 +18,20 @@ public class TechnicalBlockHandler {
     }
 
     public static void placePottedPlant(ItemStack item, Block block) {
-        if (item.getType() != Material.FLOWER_POT) {
-            return;
-        }
+        if (item.getType() != Material.FLOWER_POT) return;
 
         ItemMeta itemMeta = item.getItemMeta();
-        if (itemMeta == null) {
-            return;
-        }
+        if (itemMeta == null) return;
 
         block.setType(FlowerPotUtil.convertToMaterial(itemMeta.getDisplayName()), false);
         block.getState().update(true, false);
     }
 
     public static void placeFrostedIce(ItemStack item, Block block) {
-        if (item.getType() != Material.ICE) {
-            return;
-        }
+        if (item.getType() != Material.ICE) return;
 
         ItemMeta itemMeta = item.getItemMeta();
-        if (itemMeta == null || !itemMeta.getDisplayName().equals("Frosted Ice")) {
-            return;
-        }
+        if (itemMeta == null || !itemMeta.getDisplayName().equals("Frosted Ice")) return;
 
         block.setType(Material.FROSTED_ICE, false);
         NBTTagCompound blockStateTag = BlockUtil.getBlockStateTag(item);
@@ -54,14 +46,10 @@ public class TechnicalBlockHandler {
     }
 
     public static void placePistonHead(ItemStack item, Block block) {
-        if (item.getType() != Material.STICKY_PISTON && item.getType() != Material.PISTON) {
-            return;
-        }
+        if (item.getType() != Material.STICKY_PISTON && item.getType() != Material.PISTON) return;
 
         ItemMeta itemMeta = item.getItemMeta();
-        if (itemMeta == null || !itemMeta.getDisplayName().contains("Piston Head")) {
-            return;
-        }
+        if (itemMeta == null || !itemMeta.getDisplayName().contains("Piston Head")) return;
 
         String displayName = itemMeta.getDisplayName();
         BlockFace facing = ((Piston) block.getBlockData()).getFacing();

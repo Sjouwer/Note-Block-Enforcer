@@ -2,7 +2,7 @@ package io.github.sjouwer.blockenforcer.listeners;
 
 import io.github.sjouwer.blockenforcer.Config;
 import io.github.sjouwer.blockenforcer.handlers.NoteBlockHandler;
-import io.github.sjouwer.blockenforcer.handlers.RedstoneBlockHandler;
+import io.github.sjouwer.blockenforcer.handlers.UpdateHandler;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
@@ -37,7 +37,7 @@ public class BlockPhysicsListener implements Listener {
 
             Block blockAbove = block.getRelative(BlockFace.UP, 1);
             if (!blockAbove.equals(event.getSourceBlock()) && blockAbove.getType() == Material.NOTE_BLOCK) {
-                NoteBlockHandler.updateAllAboveNoteBlocks(blockAbove);
+                NoteBlockHandler.updateAllAboveNoteBlocks(block);
                 cancel = true;
             }
         }
@@ -50,7 +50,7 @@ public class BlockPhysicsListener implements Listener {
         }
 
         if (Config.STOP_DOOR_UPDATES && block.getBlockData() instanceof Fence) {
-            RedstoneBlockHandler.stopGateChange(block);
+            UpdateHandler.stopGateChange(block);
         }
 
         if (Config.STOP_TRIPWIRE_UPDATES) {
@@ -58,7 +58,7 @@ public class BlockPhysicsListener implements Listener {
                 cancel = true;
             }
             else if(event.getSourceBlock() == block) {
-                RedstoneBlockHandler.stopTripwireChange(block);
+                UpdateHandler.stopTripwireChange(block);
             }
         }
 
@@ -68,7 +68,7 @@ public class BlockPhysicsListener implements Listener {
             }
 
             if (event.getSourceBlock() == block) {
-                RedstoneBlockHandler.stopRedstoneChange(block);
+                UpdateHandler.stopRedstoneChange(block);
             }
         }
 

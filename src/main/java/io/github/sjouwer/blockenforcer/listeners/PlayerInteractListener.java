@@ -8,7 +8,6 @@ import net.minecraft.server.v1_14_R1.NBTTagCompound;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
-import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.block.data.type.Door;
 import org.bukkit.event.EventHandler;
@@ -48,7 +47,7 @@ public class PlayerInteractListener implements Listener {
             return;
         }
 
-        RedstoneBlockHandler.openDoorWithoutOtherChanges(event.getClickedBlock());
+        DoorHandler.openDoorWithoutOtherChanges(event.getClickedBlock());
         event.setCancelled(true);
     }
 
@@ -164,7 +163,7 @@ public class PlayerInteractListener implements Listener {
             case OAK_DOOR:
             case SPRUCE_DOOR:
             case IRON_DOOR:
-                RedstoneBlockHandler.forcePlaceDoor(blockData, blockStateTag, event);
+                DoorHandler.forcePlaceDoor(blockData, blockStateTag, event);
                 break;
 
             case STRUCTURE_BLOCK:
@@ -311,10 +310,8 @@ public class PlayerInteractListener implements Listener {
         }
 
         Block block = event.getClickedBlock();
-        Block blockAbove = block.getRelative(BlockFace.UP, 1);
-
-        NoteBlockHandler.updateAllAboveNoteBlocks(blockAbove);
-        RedstoneBlockHandler.updateRedstone(event.getClickedBlock(), true);
+        NoteBlockHandler.updateAllAboveNoteBlocks(block);
+        UpdateHandler.updateRedstone(block, true);
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
