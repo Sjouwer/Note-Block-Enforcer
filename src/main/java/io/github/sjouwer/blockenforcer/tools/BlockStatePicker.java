@@ -103,7 +103,7 @@ public class BlockStatePicker {
     private static ItemStack addBlockStateNbt(ItemStack stack, Block block) {
         net.minecraft.server.v1_14_R1.ItemStack nmsStack = CraftItemStack.asNMSCopy(stack);
         NBTTagCompound propertiesTag = new NBTTagCompound();
-        BlockUtil.toNMSBlock(block).getStateMap().forEach((key, value) -> propertiesTag.setString(key.a(), value.toString()));
+        BlockUtil.toNMSBlock(block).getStateMap().forEach((key, value) -> propertiesTag.setString(key.a(), value.toString().toLowerCase()));
 
         if (propertiesTag.isEmpty()) {
             return stack;
