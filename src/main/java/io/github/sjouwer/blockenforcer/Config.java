@@ -17,6 +17,8 @@ public class Config {
     public static final boolean FIX_TOOL_DESYNC = BlockEnforcer.getPlugin().getConfig().getBoolean("Fix-Tool-Desync");
     public static final boolean ENABLE_STRUCTURE_BLOCKS = BlockEnforcer.getPlugin().getConfig().getBoolean("Enable-Structure-Blocks");
     public static final boolean DISABLE_PISTON_MOVEMENT = BlockEnforcer.getPlugin().getConfig().getBoolean("Disable-Piston-Movement");
+    public static final boolean ENABLE_DIRECT_ITEM_MODEL_PLACEMENT = BlockEnforcer.getPlugin().getConfig().getBoolean("Enable-Direct-Item-Model-Placement");
+    public static final boolean ENABLE_FLOATING_ITEM_FRAMES = BlockEnforcer.getPlugin().getConfig().getBoolean("Enable-Floating-Item-Frames");
 
     private static Material pickerTool = Material.BONE;
 

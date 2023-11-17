@@ -31,6 +31,8 @@ public class BlockEnforcer extends JavaPlugin {
         config.addDefault("Disable-Plant-Placement-Rules", true);
         config.addDefault("Enable-Structure-Blocks", true);
         config.addDefault("Disable-Piston-Movement", true);
+        config.addDefault("Enable-Direct-Item-Model-Placement", true);
+        config.addDefault("Enable-Floating-Item-Frames", true);
         config.options().copyDefaults(true);
         saveConfig();
 
@@ -39,6 +41,7 @@ public class BlockEnforcer extends JavaPlugin {
         Bukkit.getPluginManager().registerEvents(new BlockPlaceListener(), BlockEnforcer.plugin);
         Bukkit.getPluginManager().registerEvents(new PlayerInteractListener(), BlockEnforcer.plugin);
         Bukkit.getPluginManager().registerEvents(new PistonListener(), BlockEnforcer.plugin);
+        Bukkit.getPluginManager().registerEvents(new HangingListener(), BlockEnforcer.plugin);
     }
 
     @Override
