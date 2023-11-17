@@ -31,18 +31,18 @@ public class BlockPlaceHandler {
         Block clickedBlock = event.getClickedBlock();
         ItemStack item = event.getItem();
 
-        Block placementBlock = blockOverride == null ? getPlacementBlock(clickedBlock, event.getBlockFace()) : blockOverride;
+        Block placementBlock = blockOverride;
+        if (placementBlock == null) placementBlock = getPlacementBlock(clickedBlock, event.getBlockFace(), event.getPlayer(), blockData.getMaterial());
         if (placementBlock == null) return null;
 
-        BlockState replacedBlockState = placementBlock.getState();
-        boolean waterLogged = placementBlock.getType() == Material.WATER;
-
-        placementBlock.setBlockData(blockData, false);
-        if (placementBlock.getBlockData() instanceof Waterlogged) {
-            Waterlogged waterLoggable = ((Waterlogged) placementBlock.getBlockData());
+        if (blockData instanceof Waterlogged) {
+            boolean waterLogged = placementBlock.getType() == Material.WATER;
+            Waterlogged waterLoggable = ((Waterlogged) blockData);
             waterLoggable.setWaterlogged(waterLogged);
-            placementBlock.setBlockData(waterLoggable);
         }
+
+        BlockState replacedBlockState = placementBlock.getState();
+        placementBlock.setBlockData(blockData, false);
 
         BlockPlaceEvent blockPlaceEvent = new BlockPlaceEvent(placementBlock, replacedBlockState, clickedBlock, item, event.getPlayer(), true, event.getHand());
         Bukkit.getPluginManager().callEvent(blockPlaceEvent);
@@ -56,8 +56,8 @@ public class BlockPlaceHandler {
         return placementBlock;
     }
 
-    private static Block getPlacementBlock(Block clickedBlock, BlockFace face) {
-        if (BlockUtil.isReplaceable(clickedBlock)) return clickedBlock;
+    private static Block getPlacementBlock(Block clickedBlock, BlockFace face, Player player, Material material) {
+        if (!player.isSneaking() && clickedBlock.getType() != material && BlockUtil.isReplaceable(clickedBlock)) return clickedBlock;
 
         Block relativeBlock = clickedBlock.getRelative(face);
         if (BlockUtil.isReplaceable(relativeBlock)) return relativeBlock;
