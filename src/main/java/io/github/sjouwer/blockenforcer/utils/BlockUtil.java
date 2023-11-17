@@ -12,7 +12,6 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.type.Switch;
 import org.bukkit.craftbukkit.v1_14_R1.CraftWorld;
-import org.bukkit.craftbukkit.v1_14_R1.inventory.CraftItemStack;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.Optional;
@@ -47,19 +46,6 @@ public class BlockUtil {
     }
 
     private BlockUtil() {
-    }
-
-    public static NBTTagCompound getBlockStateTag(ItemStack itemStack) {
-        net.minecraft.server.v1_14_R1.ItemStack nmsStack = CraftItemStack.asNMSCopy(itemStack);
-        if (nmsStack.hasTag()) {
-            NBTTagCompound compound = nmsStack.getTag();
-            NBTTagCompound blockStateTag = compound.getCompound("BlockStateTag");
-            if (!blockStateTag.isEmpty()) {
-                return blockStateTag;
-            }
-        }
-
-        return null;
     }
 
     public static IBlockData toNMSBlock(Block block) {

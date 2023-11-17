@@ -4,6 +4,7 @@ import io.github.sjouwer.blockenforcer.Config;
 import io.github.sjouwer.blockenforcer.handlers.*;
 import io.github.sjouwer.blockenforcer.tools.BlockStatePicker;
 import io.github.sjouwer.blockenforcer.utils.BlockUtil;
+import io.github.sjouwer.blockenforcer.utils.ItemUtil;
 import net.minecraft.server.v1_14_R1.NBTTagCompound;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -93,7 +94,7 @@ public class PlayerInteractListener implements Listener {
             return;
         }
 
-        NBTTagCompound blockStateTag = BlockUtil.getBlockStateTag(event.getItem());
+        NBTTagCompound blockStateTag = ItemUtil.getBlockStateTag(event.getItem());
         Material blockMaterial = BlockUtil.convertToBlockMaterial(event.getItem(), blockStateTag);
         if (blockMaterial == null) return;
 
