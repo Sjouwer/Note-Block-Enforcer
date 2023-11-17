@@ -6,6 +6,7 @@ import net.minecraft.server.v1_14_R1.BlockPosition;
 import net.minecraft.server.v1_14_R1.IBlockData;
 import net.minecraft.server.v1_14_R1.NBTTagCompound;
 import org.bukkit.Material;
+import org.bukkit.Rotation;
 import org.bukkit.Tag;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
@@ -155,6 +156,25 @@ public class BlockUtil {
             case WEST: return BlockFace.SOUTH;
             case SOUTH: return BlockFace.EAST;
             default: return BlockFace.NORTH;
+        }
+    }
+
+    public static Rotation convertToRotation(BlockFace playerFace, BlockFace blockFace) {
+        if (blockFace.equals(BlockFace.UP)) {
+            switch (playerFace) {
+                case EAST: return Rotation.CLOCKWISE;
+                case SOUTH: return Rotation.FLIPPED;
+                case WEST: return Rotation.COUNTER_CLOCKWISE;
+                default: return Rotation.NONE;
+            }
+        }
+        else {
+            switch (playerFace) {
+                case WEST: return Rotation.COUNTER_CLOCKWISE;
+                case NORTH: return Rotation.FLIPPED;
+                case EAST: return Rotation.CLOCKWISE;
+                default: return Rotation.NONE;
+            }
         }
     }
 

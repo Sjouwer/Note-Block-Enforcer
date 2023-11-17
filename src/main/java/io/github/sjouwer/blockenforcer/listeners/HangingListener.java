@@ -1,6 +1,7 @@
 package io.github.sjouwer.blockenforcer.listeners;
 
 import io.github.sjouwer.blockenforcer.Config;
+import io.github.sjouwer.blockenforcer.utils.BlockUtil;
 import io.github.sjouwer.blockenforcer.utils.ItemUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -130,6 +131,10 @@ public class HangingListener implements Listener {
                 ItemFrame itemFrame = player.getWorld().spawn(block.getRelative(face).getLocation(), ItemFrame.class, frame -> {
                     frame.setFacingDirection(face);
                     frame.setItem(item);
+
+                    if (face.equals(BlockFace.DOWN) || face.equals(BlockFace.UP)) {
+                        frame.setRotation(BlockUtil.convertToRotation(player.getFacing(), face));
+                    }
                 });
 
                 HangingPlaceEvent hangingPlaceEvent = new HangingPlaceEvent(itemFrame, player, block, face);
