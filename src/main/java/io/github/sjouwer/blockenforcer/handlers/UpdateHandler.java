@@ -17,8 +17,6 @@ import java.util.Map;
 public class UpdateHandler {
     private static final Map<Block, BlockData> BlocksToChange = new HashMap<>();
     private static final List<Block> updatedRedstone = new ArrayList<>();
-    private static final List<Block> redstoneToUpdate = new ArrayList<>();
-    private static int currentUpdateCount = 0;
 
     private UpdateHandler() {
     }
@@ -49,38 +47,15 @@ public class UpdateHandler {
         }
     }
 
-    private static void scheduleRedstoneUpdate(Block blockToUpdate) {
-        if (blockToUpdate.getType() != Material.REDSTONE_WIRE || updatedRedstone.contains(blockToUpdate) || redstoneToUpdate.contains(blockToUpdate)) {
-            return;
-        }
-
-        redstoneToUpdate.add(blockToUpdate);
-
-        if (redstoneToUpdate.size() == 1) {
-            Bukkit.getScheduler().runTaskLater(BlockEnforcer.getPlugin(), () -> {
-                currentUpdateCount = 0;
-                List<Block> blocks = new ArrayList<>(redstoneToUpdate);
-                redstoneToUpdate.clear();
-                for (Block block : blocks) {
-                    updateRedstoneNow(block);
-                }
-            }, 1L);
-        }
-    }
-
     private static void updateRedstoneNow(Block block) {
-        if (block.getType() != Material.REDSTONE_WIRE || updatedRedstone.contains(block) || redstoneToUpdate.contains(block)) {
+        if (block.getType() != Material.REDSTONE_WIRE || updatedRedstone.contains(block)) {
             return;
         }
 
-        if (currentUpdateCount < Config.MAX_REDSTONE_UPDATES) {
-            currentUpdateCount++;
+        if (updatedRedstone.size() < Config.MAX_REDSTONE_UPDATES) {
             block.getState().update(true, false);
             updatedRedstone.add(block);
             updateRedstone(block);
-        }
-        else {
-            scheduleRedstoneUpdate(block);
         }
     }
 

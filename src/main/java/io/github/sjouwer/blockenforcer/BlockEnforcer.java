@@ -22,7 +22,7 @@ public class BlockEnforcer extends JavaPlugin {
         config.addDefault("Stop-NoteBlock-Updates", true);
         config.addDefault("Stop-Tripwire-Updates", true);
         config.addDefault("Stop-Redstone-Updates", true);
-        config.addDefault("Max-Redstone-Updates-Per-Tick", 100);
+        config.addDefault("Max-Redstone-Updates-Per-Tick", 1000);
         config.addDefault("Stop-Door-Updates", true);
         config.addDefault("Stop-Turtle-Egg-Updates", true);
         config.addDefault("Fix-Tool-Desync", true);
